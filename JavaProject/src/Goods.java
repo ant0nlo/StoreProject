@@ -1,7 +1,8 @@
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Goods {
-    private int id;
+	private int id;
     private String name;
     private double unitDeliveryPrice;
     private Category category;
@@ -119,6 +120,19 @@ public class Goods {
             sellingPrice *= (1 - discountPercentage / 100);
         }
         return sellingPrice;
+    }
+    
+    @Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+    
+	@Override
+	public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Goods goods = (Goods) o;
+        return id == goods.id;
     }
     
     @Override

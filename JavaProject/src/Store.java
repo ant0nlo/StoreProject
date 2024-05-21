@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Store {
     private List<Cashier> cashiers;
     private List<Goods> goodsList;
@@ -12,7 +11,6 @@ public class Store {
     
     // Constructor
     public Store() {
-
         this.cashiers = new ArrayList<>();
         this.goodsList = new ArrayList<>();
         this.setReceipts(new ArrayList<>());
@@ -104,24 +102,5 @@ public class Store {
     public static void setMarkupNonEdible(double markupNonEdible) {
         Store.markupNonEdible = markupNonEdible;
     }
-	/*
-    // Method to sell goods
-    public void sellGoods(Cashier cashier, List<Goods> goodsList, List<Integer> quantityToSell) {
-        Receipt receipt = new Receipt(cashier, goodsList, quantityToSell);
-        for (int i = 0; i < goodsList.size(); i++) {
-            Goods item = goodsList.get(i);
-            Goods goods = item.getGoods();
-            int quantity = quantityToSell.get(i); // Взимаме количеството за текущата стока
-            if (goods.getQuantityAvailable() < quantity) {
-                throw new IllegalArgumentException("Not enough quantity available for sale: " + goods.getName());
-            }
-            goods.decreaseQuantity(quantity);
-        }
-        getReceipts().add(receipt);
-        totalTurnover += receipt.getTotalAmountPaid();
-        receipt.saveReceiptToFile();
 
-    }
-*/
-    
 }

@@ -24,27 +24,6 @@ public class Main {
         store.addGoods(goods2);
         System.out.println("Total delivery costs: $" + store.calculateTotalDeliveryCosts());
         
-        /*
-        List<Goods> items = new ArrayList<>();
-        List<Integer> quantityToSell = new ArrayList<>();
-        items.add(goods1);
-        items.add(goods2);    
-        quantityToSell.add(9000); // Quantity to sell for goods1
-        quantityToSell.add(8000); // Quantity to sell for goods2
-        Checkout checkout = new Checkout(cashier1, store);
-        double buyerMoney = 50000.0;
-        checkout.markGoods(items, quantityToSell, buyerMoney);
-       */
-        /*
-        List<Goods> items = new ArrayList<>();
-        List<Integer> quantityToBuy = new ArrayList<>();
-        ShoppingCart cart = new ShoppingCart(items, quantityToBuy, 200);
-        Checkout checkout = new Checkout(cashier1, store);
-        cart.addItem(goods1, 100);
-        cart.addItem(goods2, 10);     
-        checkout.markGoods(cart);
-        */
-        
         Map<Goods, Integer> items = new HashMap<>();
         ShoppingCart cart = new ShoppingCart(items, 200.55);
         Checkout checkout = new Checkout(cashier2, store);

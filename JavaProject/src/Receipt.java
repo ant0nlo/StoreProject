@@ -1,180 +1,8 @@
-/*
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-public class Receipt {
-    private static int serialNumberCounter = 1;
-    private int serialNumber;
-    private Cashier issuingCashier;
-    private LocalDateTime issuanceDateTime;
-    private List<Goods> items;
-    private List<Integer> quantityToSell; // Променлива за съхранение на броя на всяка от стоките, които потребителя иска да купи
-    private double totalAmountPaid;
-
-    // Constructor
-    public Receipt(Cashier issuingCashier, List<Goods> items, List<Integer> quantityToSell) {
-        this.serialNumber = serialNumberCounter++;
-        this.issuingCashier = issuingCashier;
-        this.issuanceDateTime = LocalDateTime.now();
-        this.items = new ArrayList<>(items);
-        this.quantityToSell = new ArrayList<>(quantityToSell); // Инициализиране на променливата за съхранение на броя продукти за продажба
-        calculateTotalAmountPaid();
-    }
-
-    // Getters
-    public int getSerialNumber() {
-        return serialNumber;
-    }
-
-    public Cashier getIssuingCashier() {
-        return issuingCashier;
-    }
-
-    public LocalDateTime getIssuanceDateTime() {
-        return issuanceDateTime;
-    }
-
-    public List<Goods> getItems() {
-        return items;
-    }
-
-    public List<Integer> getQuantityToSell() {
-        return quantityToSell;
-    }
-
-    public double getTotalAmountPaid() {
-        return totalAmountPaid;
-    }
-
-    // Method to calculate the total amount paid
-    private void calculateTotalAmountPaid() {
-        totalAmountPaid = 0;
-        for (int i = 0; i < items.size(); i++) {
-            Goods item = items.get(i);
-            int quantity = quantityToSell.get(i); // Вземаме броя на всяка стока, която потребителя иска да купи
-            totalAmountPaid += item.calculateSellingPrice() * quantity; // Умножаваме цената на стоката по броя продукти за продажба
-        }
-    }
-
-    // Method to generate receipt content
-    public String generateReceiptContent() {
-        StringBuilder receiptContent = new StringBuilder();
-        receiptContent.append("Receipt Serial Number: ").append(serialNumber).append("\n");
-        receiptContent.append("Issued by: ").append(issuingCashier.getName()).append("\n");
-        receiptContent.append("Date and Time of Issuance: ").append(issuanceDateTime).append("\n\n");
-        receiptContent.append("Items:\n");
-        for (int i = 0; i < items.size(); i++) {
-            Goods item = items.get(i);
-            int quantity = quantityToSell.get(i); // Вземаме броя на всяка стока, която потребителя иска да купи
-            receiptContent.append(item.getName()).append(" price: $").append(item.getUnitDeliveryPrice()).append(" quantity: ").append(quantity).append("\n");
-        }
-        receiptContent.append("\nTotal: $").append(totalAmountPaid).append("\n");
-        return receiptContent.toString();
-    }
-
-    // Method to save receipt to a file
-    public void saveReceiptToFile() {
-        String filename = "Receipt_" + serialNumber + ".txt";
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(generateReceiptContent());
-        } catch (IOException e) {
-            System.err.println("Error occurred while saving receipt to file: " + e.getMessage());
-        }
-    }
-    
-}
-*/
-/*
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-public class Receipt {
-    private static int serialNumberCounter = 1;
-    private int serialNumber;
-    private Cashier issuingCashier;
-    private LocalDateTime issuanceDateTime;
-    private ShoppingCart shoppingCart;
-    private double totalAmountPaid;
-
-    // Constructor
-    public Receipt(Cashier issuingCashier, ShoppingCart shoppingCart) {
-        this.serialNumber = serialNumberCounter++;
-        this.issuingCashier = issuingCashier;
-        this.issuanceDateTime = LocalDateTime.now();
-        this.shoppingCart = shoppingCart;
-        calculateTotalAmountPaid();
-    }
-
-    // Getters
-    public int getSerialNumber() {
-        return serialNumber;
-    }
-
-    public Cashier getIssuingCashier() {
-        return issuingCashier;
-    }
-
-    public LocalDateTime getIssuanceDateTime() {
-        return issuanceDateTime;
-    }
-
-    public double getTotalAmountPaid() {
-        return totalAmountPaid;
-    }
-
-    
-    // Method to calculate the total amount paid
-    private void calculateTotalAmountPaid() {
-        totalAmountPaid = 0;
-            for (int i = 0; i < shoppingCart.getGoodsList().size(); i++) {
-                Goods item = shoppingCart.getGoodsList().get(i);
-                int quantity = shoppingCart.getQuantities().get(i);
-                totalAmountPaid += item.calculateSellingPrice() * quantity;
-        }
-    }
-
-    // Method to generate receipt content
-    public String generateReceiptContent() {
-        StringBuilder receiptContent = new StringBuilder();
-        receiptContent.append("Receipt Serial Number: ").append(serialNumber).append("\n");
-        receiptContent.append("Issued by: ").append(issuingCashier.getName()).append("\n");
-        receiptContent.append("Date and Time of Issuance: ").append(issuanceDateTime).append("\n\n");
-        receiptContent.append("Items:\n");
-        	List<Goods> goodsList = shoppingCart.getGoodsList();
-            List<Integer> quantities = shoppingCart.getQuantities();
-            for (int i = 0; i < goodsList.size(); i++) {
-                Goods goods = goodsList.get(i);
-                int quantity = quantities.get(i);
-            receiptContent.append(goods.getName()).append(" price: $").append(goods.getUnitDeliveryPrice()).append(" quantity: ").append(quantity).append("\n");
-        }
-        receiptContent.append("\nTotal: $").append(totalAmountPaid).append("\n");
-        return receiptContent.toString();
-
-    } 
-    
-    // Method to save receipt to a file
-    public void saveReceiptToFile() {
-        String filename = "Receipt_" + serialNumber + ".txt";
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(generateReceiptContent());
-        } catch (IOException e) {
-            System.err.println("Error occurred while saving receipt to file: " + e.getMessage());
-        }
-    }
-
-}
-*/
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 public class Receipt {
     private static int serialNumberCounter = 1;
@@ -306,6 +134,20 @@ public class Receipt {
             System.err.println("Error occurred while saving receipt to file: " + e.getMessage());
         }
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(serialNumber);
+	}
+
+	@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Receipt receipt = (Receipt) o;
+        return serialNumber == receipt.serialNumber;
+    }
+	
 }
 
 
