@@ -1,19 +1,19 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 public class Store {
-    private List<Cashier> cashiers;
-    private List<Goods> goodsList;
-    private List<Receipt> receipts;
+    private Set<Cashier> cashiers;
+    private Set<Receipt> receipts;
+    private Map<Integer, Goods> goodsMap;
     private double totalTurnover;
     private static double markupEatable;
     private static double markupNonEdible;
-    
+
     // Constructor
     public Store() {
-        this.cashiers = new ArrayList<>();
-        this.goodsList = new ArrayList<>();
-        this.setReceipts(new ArrayList<>());
+        this.cashiers = new HashSet<>();
+        this.goodsMap = new HashMap<>();
+        this.receipts = new HashSet<>();
         this.totalTurnover = 0;
     }
 
@@ -24,11 +24,20 @@ public class Store {
 
     // Method to add goods to the store
     public void addGoods(Goods goods) {
-        goodsList.add(goods);
+        goodsMap.put(goods.getId(), goods);
+    }
+
+    // Method to get goods by id
+    public Goods getGoodsById(int id) {
+        return goodsMap.get(id);
     }
 
     // Method to check goods availability
-    public boolean checkAvailability(Goods goods, int quantity) {
+    public boolean checkAvailability(int goodsId, int quantity) {
+        Goods goods = getGoodsById(goodsId);
+        if (goods == null) {
+            throw new IllegalArgumentException("Goods with id " + goodsId + " not found.");
+        }
         return goods.getQuantityAvailable() >= quantity;
     }
 
@@ -44,7 +53,7 @@ public class Store {
     // Method to calculate total costs for goods delivery
     public double calculateTotalDeliveryCosts() {
         double totalDeliveryCosts = 0;
-        for (Goods goods : goodsList) {
+        for (Goods goods : goodsMap.values()) {
             totalDeliveryCosts += goods.getUnitDeliveryPrice() * goods.getTotalAvailable();
         }
         return totalDeliveryCosts;
@@ -65,23 +74,11 @@ public class Store {
         return getReceipts().size();
     }
 
-	public static double getMarkupEatable() {
-		return markupEatable;
-	}
-
-	public static double getMarkupNonEdible() {
-		return markupNonEdible;
-	}
-
-	public List<Receipt> getReceipts() {
-		return receipts;
-	}
-	
-	public List<Receipt> getReceipts2() {
+	public Set<Receipt> getReceipts() {
 		return receipts;
 	}
 
-	public void setReceipts(List<Receipt> receipts) {
+	public void setReceipts(Set<Receipt> receipts) {
 		this.receipts = receipts;
 	}
 	
@@ -91,6 +88,14 @@ public class Store {
 
 	public void setTotalTurnover(double totalTurnover) {
 		this.totalTurnover = totalTurnover;
+	}
+	
+	public static double getMarkupEatable() {
+		return markupEatable;
+	}
+
+	public static double getMarkupNonEdible() {
+		return markupNonEdible;
 	}
 	
 	 // Static setter method for markupEatable

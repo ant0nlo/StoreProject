@@ -2,7 +2,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Goods {
-	private int id;
+    private int id;
     private String name;
     private double unitDeliveryPrice;
     private Category category;
@@ -24,7 +24,7 @@ public class Goods {
         this.totalAvailable = totalAvailable;
         this.quantityAvailable = totalAvailable;
     }
-    
+
     public enum Category {
         EATABLE,
         NON_EDIBLE
@@ -78,23 +78,23 @@ public class Goods {
     }
     public void setQuantityAvailable(int quantityAvailable) {
         this.quantityAvailable = quantityAvailable;
-    }  
+    }
     public int getTotalAvailable() {
         return totalAvailable;
     }
     public void setTotalAvailable(int totalAvailable) {
         this.totalAvailable = totalAvailable;
-    }  
-    
+    }
+
     public Goods getGoods() {
         return this;
     }
-    
+
     // Method to check if the goods are expired
     public boolean isExpired() {
         return expirationDate != null && LocalDate.now().isAfter(expirationDate);
     }
-    
+
     // Method to decrease quantity when selling goods
     public void decreaseQuantity(int quantitySold) {
         if (quantitySold > quantityAvailable) {
@@ -102,11 +102,11 @@ public class Goods {
         }
         quantityAvailable -= quantitySold;
     }
-    
+
     // Method to calculate selling price
     public double calculateSellingPrice() {
         double markupPercentage;
-    	if (category == Category.EATABLE) {
+        if (category == Category.EATABLE) {
             markupPercentage = Store.getMarkupEatable();
         } else if (category == Category.NON_EDIBLE) {
             markupPercentage = Store.getMarkupNonEdible();
@@ -121,20 +121,20 @@ public class Goods {
         }
         return sellingPrice;
     }
-    
+
     @Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-    
-	@Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Goods goods = (Goods) o;
         return id == goods.id;
     }
-    
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     @Override
     public String toString() {
         return "Goods{" +
