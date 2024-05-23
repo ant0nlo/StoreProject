@@ -34,24 +34,6 @@ public class DatabaseManager {
                     );
                 """;
             
-            try (Connection conn = connect();
-                    Statement stmt = conn.createStatement()) {
-                   // Изпълняваме заявката за създаване на таблицата Cashiers
-                   stmt.execute(createCashiersTable);
-                   
-                   // Проверяваме дали таблицата Cashiers е успешно създадена
-                   ResultSet rs = conn.getMetaData().getTables(null, null, "Cashiers", null);
-                   if (rs.next()) {
-                       System.out.println("Table 'Cashiers' created successfully");
-                   } else {
-                       System.out.println("Table 'Cashiers' creation failed");
-                   }
-                   
-                   // код за създаване на другите таблиците...
-               } catch (SQLException e) {
-                   System.out.println(e.getMessage());
-               }
-            
             String createReceiptsTable = """
                 CREATE TABLE IF NOT EXISTS Receipts (
                     serialNumber INTEGER PRIMARY KEY,
@@ -114,6 +96,46 @@ public class DatabaseManager {
         }
     }
 
-    
+    public void addItemToShoppingCart(int receiptSerialNumber, int goodsId, int quantity) {
+        String sql = "INSERT INTO ShoppingCartItems(receiptSerialNumber, goodsId, quantity) VALUES(?,?,?)";
+
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, receiptSerialNumber);
+            pstmt.setInt(2, goodsId);
+            pstmt.setInt(3, quantity);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void removeItemFromShoppingCart(int receiptSerialNumber, int goodsId) {
+        String sql = "DELETE FROM ShoppingCartItems WHERE receiptSerialNumber = ? AND goodsId = ?";
+
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, receiptSerialNumber);
+            pstmt.setInt(2, goodsId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void updateItemQuantityInShoppingCart(int receiptSerialNumber, int goodsId, int newQuantity) {
+        String sql = "UPDATE ShoppingCartItems SET quantity = ? WHERE receiptSerialNumber = ? AND goodsId = ?";
+
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, newQuantity);
+            pstmt.setInt(2, receiptSerialNumber);
+            pstmt.setInt(3, goodsId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 
 }

@@ -100,7 +100,7 @@ public class Goods {
         if (quantitySold > quantityAvailable) {
             throw new IllegalArgumentException("Not enough quantity available for sale.");
         }
-        quantityAvailable -= quantitySold;
+        quantityAvailable-= quantitySold;
     }
 
     // Method to calculate selling price
