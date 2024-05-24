@@ -7,10 +7,13 @@ public class GoodsTest {
 
     private Goods goods;
 
+
     @BeforeEach
     public void setUp() {
-        goods = new Goods(1, "Apple", 1.0, Category.EATABLE, LocalDate.now().plusDays(5),
-                          10, 5, 100);
+        Store.setMarkup(Category.EATABLE, 20); 
+
+        goods = new Goods(1, "Apple", 1.0, Category.EATABLE,LocalDate.now().plusDays(5),5, 100);
+
     }
 
     @Test

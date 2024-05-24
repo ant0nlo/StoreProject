@@ -1,10 +1,13 @@
 
 public enum Category {
-    EATABLE,
-    NON_EDIBLE;
+	EATABLE(0.0),
+    NON_EDIBLE(0.0);
 
-    private double value = 0.0;
+    private double value;
 
+    Category(double value) {
+        this.value = value;
+    }
 
     public void setValue(double value) {
         this.value = value;
@@ -13,8 +16,7 @@ public enum Category {
     public double getValue() {
         return value;
     }
-    
-    public Category  getName() {
+    public Category getName() {
         return this;
     }
 }

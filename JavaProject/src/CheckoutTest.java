@@ -22,8 +22,8 @@ class CheckoutTest {
         store = new Store();
         Store.setMarkup(Category.EATABLE, 20); 
 
-        goods1 = new Goods(1, "Apple", 1.0,Category.EATABLE, LocalDate.now().plusDays(5), 10, 5, 100);
-        goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 10, 5, 100);
+        goods1 = new Goods(1, "Apple", 1.0,Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 5, 100);
 
         Map<Goods, Integer> items = new HashMap<>();
         shoppingCart = new ShoppingCart(items, 100.0);
@@ -63,7 +63,7 @@ class CheckoutTest {
 
     @Test
     public void testSellGoodsItemExpired() {
-        goods1.setExpirationDate(LocalDate.now().minusDays(1)); // Item expired
+        store.setExpirationDateInStore(goods1, LocalDate.now().minusDays(1)); // Item expired
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             checkout.sellGoods(shoppingCart);

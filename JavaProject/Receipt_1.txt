@@ -1,14 +1,14 @@
          RECEIPT
 =========================
 Serial Number: 1
-Issued by: John Doe
+Issued by: Anna Smith
 -------------------------
 Date: 2024-05-24
-Time: 12:01:12
+Time: 15:28:16
 -------------------------
--2 Apple           $1.0
--3 Milk            $2.0
+-20 Apple           $1.56
+-10 Milk            $2.0
 =========================
- TOTAL:           $9.6
-Cash:             $100.0
-Change:           $90.4
+ TOTAL:          $61.44
+Cash:            $200.55
+Change:          $139.11

@@ -34,9 +34,9 @@ public class DatabaseManagerTest {
     public void testAddGoods() {
         DatabaseManager dbManager = new DatabaseManager();
         dbManager.createTables();
+    	
+        Goods goods = new Goods(1, "Apple Juice", 1.56, Category.EATABLE,LocalDate.now().plusDays(5), 5, 10000);
 
-        Goods goods = new Goods(1, "Apple Juice", 1.56, Category.EATABLE,
-                                LocalDate.now().plusDays(5), 10, 5, 10000);
         dbManager.addGoods(goods);
 
         try (Connection conn = dbManager.connect();

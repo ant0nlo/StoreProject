@@ -1,7 +1,4 @@
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DatabaseManager {
 	private static final String URL = "jdbc:sqlite:mydatabase.db";

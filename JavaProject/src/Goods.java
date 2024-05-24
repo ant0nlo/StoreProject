@@ -7,20 +7,20 @@ public class Goods {
     private double unitDeliveryPrice;
     private Category category;
     private LocalDate expirationDate;
-    private double markupPercentage;
     private double discountPercentage;
+    private double markupPercentage;
     private int totalAvailable;
     private int quantityAvailable;
 
     public Goods(int id, String name, double unitDeliveryPrice, Category category, LocalDate expirationDate,
-                 double markupPercentage, double discountPercentage, int totalAvailable) {
+    		double discountPercentage, int totalAvailable) {
         this.id = id;
         this.name = name;
         this.unitDeliveryPrice = unitDeliveryPrice;
         this.category = category;
         this.expirationDate = expirationDate;
-        this.markupPercentage = markupPercentage;
         this.discountPercentage = discountPercentage;
+        this.markupPercentage = category.getValue();
         this.totalAvailable = totalAvailable;
         this.quantityAvailable = totalAvailable;
     }

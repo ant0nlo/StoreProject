@@ -1,10 +1,6 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.sql.*;
-
 
 public class Main {
     public static void main(String[] args) {
@@ -27,8 +23,8 @@ public class Main {
         dbManager.addCashier(cashier2);
 
         // Adding goods
-        Goods goods1 = new Goods(1, "Apple", 1.56, Category.EATABLE, LocalDate.now().plusDays(5), 10, 5, 10000);
-        Goods goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 10, 5, 10000);
+        Goods goods1 = new Goods(1, "Apple", 1.56, Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 5, 10000);
         store.addGoods(goods1);
         store.addGoods(goods2);
         

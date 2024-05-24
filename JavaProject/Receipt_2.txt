@@ -4,7 +4,7 @@ Serial Number: 2
 Issued by: John Doe
 -------------------------
 Date: 2024-05-24
-Time: 12:00:31
+Time: 15:28:16
 -------------------------
 -10 Apple           $1.56
 -5 Milk            $2.0

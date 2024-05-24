@@ -7,6 +7,7 @@ public class Store {
     private Map<Integer, Goods> goodsMap;
     private double totalTurnover;
 
+
     // Constructor
     public Store() {
         this.cashiers = new HashSet<>();
@@ -14,7 +15,7 @@ public class Store {
         this.receipts = new HashSet<>();
         this.totalTurnover = 0;
     }
-
+    
     // Method to add a cashier to the store
     public void addCashier(Cashier cashier) {
         cashiers.add(cashier);
@@ -91,7 +92,16 @@ public class Store {
 	public static void setMarkup(Category category, double value) {
         category.setValue(value);
     }
+	
 	public static double getMarkup(Category category) {
         return category.getValue();
+    }
+	
+    public void setExpirationDateInStore(Goods good, LocalDate expirationDate) {
+    	good.setExpirationDate(expirationDate);
+    }
+    
+    public void setDiscountPercentageInStore(Goods good, double discountPercentage) {
+    	good.setDiscountPercentage(discountPercentage);
     }
 }
