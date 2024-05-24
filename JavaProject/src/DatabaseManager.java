@@ -71,7 +71,7 @@ public class DatabaseManager {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, goods.getName());
             pstmt.setDouble(2, goods.getUnitDeliveryPrice());
-            pstmt.setString(3, goods.getCategory().name());
+            pstmt.setString(3, goods.getCategory().toString());
             pstmt.setString(4, goods.getExpirationDate().toString());
             pstmt.setDouble(5, goods.getMarkupPercentage());
             pstmt.setDouble(6, goods.getDiscountPercentage());

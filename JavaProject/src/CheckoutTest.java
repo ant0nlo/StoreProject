@@ -20,10 +20,10 @@ class CheckoutTest {
     public void setUp() {
         cashier = new Cashier(1, "John Doe", 1000);
         store = new Store();
-        Store.setMarkupEatable(20);
+        Store.setMarkup(Category.EATABLE, 20); 
 
-        goods1 = new Goods(1, "Apple", 1.0, Goods.Category.EATABLE, LocalDate.now().plusDays(5), 10, 5, 100);
-        goods2 = new Goods(2, "Milk", 2.0, Goods.Category.EATABLE, LocalDate.now().plusDays(7), 10, 5, 100);
+        goods1 = new Goods(1, "Apple", 1.0,Category.EATABLE, LocalDate.now().plusDays(5), 10, 5, 100);
+        goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 10, 5, 100);
 
         Map<Goods, Integer> items = new HashMap<>();
         shoppingCart = new ShoppingCart(items, 100.0);

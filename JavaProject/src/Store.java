@@ -6,8 +6,6 @@ public class Store {
     private Set<Receipt> receipts;
     private Map<Integer, Goods> goodsMap;
     private double totalTurnover;
-    private static double markupEatable;
-    private static double markupNonEdible;
 
     // Constructor
     public Store() {
@@ -90,22 +88,10 @@ public class Store {
 		this.totalTurnover = totalTurnover;
 	}
 	
-	public static double getMarkupEatable() {
-		return markupEatable;
-	}
-
-	public static double getMarkupNonEdible() {
-		return markupNonEdible;
-	}
-	
-	 // Static setter method for markupEatable
-    public static void setMarkupEatable(double markupEatable) {
-        Store.markupEatable = markupEatable;
+	public static void setMarkup(Category category, double value) {
+        category.setValue(value);
     }
-
-    // Static setter method for markupNonEdible
-    public static void setMarkupNonEdible(double markupNonEdible) {
-        Store.markupNonEdible = markupNonEdible;
+	public static double getMarkup(Category category) {
+        return category.getValue();
     }
-
 }

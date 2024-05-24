@@ -9,7 +9,7 @@ public class GoodsTest {
 
     @BeforeEach
     public void setUp() {
-        goods = new Goods(1, "Apple", 1.0, Goods.Category.EATABLE, LocalDate.now().plusDays(5),
+        goods = new Goods(1, "Apple", 1.0, Category.EATABLE, LocalDate.now().plusDays(5),
                           10, 5, 100);
     }
 
@@ -26,7 +26,7 @@ public class GoodsTest {
 
     @Test
     public void testCalculateSellingPrice() {
-        Store.setMarkupEatable(20);
+        Store.setMarkup(Category.EATABLE, 20); 
 
     	double expectedSellingPrice = 1.0 * (1 + (20 / 100.0));
         assertEquals(expectedSellingPrice, goods.calculateSellingPrice(), 0.001,

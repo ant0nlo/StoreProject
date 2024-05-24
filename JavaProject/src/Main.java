@@ -14,8 +14,8 @@ public class Main {
         
         // Creating store
         Store store = new Store();
-        Store.setMarkupEatable(20);
-        Store.setMarkupNonEdible(10);
+        Store.setMarkup(Category.EATABLE, 20); 
+        Store.setMarkup(Category.NON_EDIBLE, 10); 
 
         // Adding cashiers
         Cashier cashier1 = new Cashier(1,"John Doe", 1000);
@@ -27,8 +27,8 @@ public class Main {
         dbManager.addCashier(cashier2);
 
         // Adding goods
-        Goods goods1 = new Goods(1, "Apple", 1.56, Goods.Category.EATABLE, LocalDate.now().plusDays(5), 10, 5, 10000);
-        Goods goods2 = new Goods(2, "Milk", 2.0, Goods.Category.EATABLE, LocalDate.now().plusDays(7), 10, 5, 10000);
+        Goods goods1 = new Goods(1, "Apple", 1.56, Category.EATABLE, LocalDate.now().plusDays(5), 10, 5, 10000);
+        Goods goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 10, 5, 10000);
         store.addGoods(goods1);
         store.addGoods(goods2);
         

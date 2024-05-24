@@ -24,12 +24,7 @@ public class Goods {
         this.totalAvailable = totalAvailable;
         this.quantityAvailable = totalAvailable;
     }
-
-    public enum Category {
-        EATABLE,
-        NON_EDIBLE
-    }
-
+    
     // Getters and setters
     public int getId() {
         return id;
@@ -106,22 +101,19 @@ public class Goods {
     // Method to calculate selling price
     public double calculateSellingPrice() {
         double markupPercentage;
-        if (category == Category.EATABLE) {
-            markupPercentage = Store.getMarkupEatable();
-        } else if (category == Category.NON_EDIBLE) {
-            markupPercentage = Store.getMarkupNonEdible();
+        if (category != null) {
+        	markupPercentage = Store.getMarkup(category);
         } else {
             throw new IllegalArgumentException("Invalid category");
         }
 
         double sellingPrice = unitDeliveryPrice * (1 + markupPercentage / 100);
-        // Check expiration date proximity and apply discount if needed
         if (expirationDate != null && LocalDate.now().isAfter(expirationDate.minusDays(3))) {
             sellingPrice *= (1 - discountPercentage / 100);
         }
         return sellingPrice;
     }
-
+     
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
