@@ -12,7 +12,6 @@ public class Receipt {
     private ShoppingCart shoppingCart;
     private double totalAmountPaid;
 
-    // Constructor
     public Receipt(Cashier issuingCashier, ShoppingCart shoppingCart) {
         this.serialNumber = serialNumberCounter++;
         this.issuingCashier = issuingCashier;
@@ -21,7 +20,6 @@ public class Receipt {
         calculateTotalAmountPaid();
     }
 
-    // Getters
     public int getSerialNumber() {
         return serialNumber;
     }
@@ -38,7 +36,6 @@ public class Receipt {
         return totalAmountPaid;
     }
     
-    // Setters
     public void setSerialNumber(int serialNumber) {
         this.serialNumber = serialNumber;
     }
@@ -108,7 +105,7 @@ public class Receipt {
         			  .append("\n");
         receiptContent.append("Change:")
         			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
-        			  .append(" $").append(shoppingCart.getCustomerMoney() - totalAmountPaid)
+        			  .append(" $").append(String.format("%.2f", shoppingCart.getCustomerMoney() - totalAmountPaid))
         			  .append("\n");
         
         return receiptContent.toString();

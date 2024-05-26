@@ -9,7 +9,7 @@ public class Checkout  {
         this.store = store;
     }
 
-    public void sellGoods(ShoppingCart shoppingCart) {
+    public Receipt sellGoods(ShoppingCart shoppingCart) {
         Receipt receipt = new Receipt(cashier, shoppingCart);
         Map<Goods, Integer> items = shoppingCart.getItems();
         
@@ -29,10 +29,12 @@ public class Checkout  {
         store.setTotalTurnover(store.getTotalTurnover() + receipt.getTotalAmountPaid());
         store.getReceipts().add(receipt);
         receipt.saveReceiptToFile();
+        return receipt;
+
     }
 
-    public void markGoods(ShoppingCart shoppingCart) {
-        double totalAmountToPay = 0;
+    public Receipt markGoods(ShoppingCart shoppingCart) {
+        double totalAmountToPay = 0;	
         Map<Goods, Integer> items = shoppingCart.getItems();
         
         for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
@@ -45,6 +47,6 @@ public class Checkout  {
             throw new IllegalArgumentException("Not enough money to buy these goods.");
         }
         
-        sellGoods(shoppingCart); 
+        return sellGoods(shoppingCart); 
     }
 }

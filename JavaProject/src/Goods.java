@@ -25,7 +25,6 @@ public class Goods {
         this.quantityAvailable = totalAvailable;
     }
     
-    // Getters and setters
     public int getId() {
         return id;
     }

@@ -5,14 +5,12 @@ public class Cashier {
     private int id;
     private double monthlySalary;
 
-    // Constructor
     public Cashier(int id, String name, double monthlySalary) {
     	this.id = id;
         this.name = name;
         this.monthlySalary = monthlySalary;
     }
 
-    // Getters and setters
     public String getName() {
         return name;
     }
@@ -37,7 +35,6 @@ public class Cashier {
         this.monthlySalary = monthlySalary;
     }
 
-    // Method to calculate annual salary
     public double calculateAnnualSalary() {
         return monthlySalary * 12;
     }

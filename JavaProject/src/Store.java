@@ -7,8 +7,6 @@ public class Store {
     private Map<Integer, Goods> goodsMap;
     private double totalTurnover;
 
-
-    // Constructor
     public Store() {
         this.cashiers = new HashSet<>();
         this.goodsMap = new HashMap<>();
@@ -16,17 +14,14 @@ public class Store {
         this.totalTurnover = 0;
     }
     
-    // Method to add a cashier to the store
     public void addCashier(Cashier cashier) {
         cashiers.add(cashier);
     }
 
-    // Method to add goods to the store
     public void addGoods(Goods goods) {
         goodsMap.put(goods.getId(), goods);
     }
 
-    // Method to get goods by id
     public Goods getGoodsById(int id) {
         return goodsMap.get(id);
     }
@@ -58,7 +53,6 @@ public class Store {
         return totalDeliveryCosts;
     }
 
-    // Method to calculate total revenue from goods sold
     public double calculateTotalRevenue() {
         return totalTurnover;
     }
