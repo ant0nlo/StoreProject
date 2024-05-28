@@ -2,11 +2,19 @@ import java.sql.*;
 import java.util.Map;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:sqlite:mydatabase.db";
+	 String URL = "jdbc:mysql://localhost:3306/mydb";
+	 String username = "root";
+	 String password = "123";
 
-    public Connection connect() throws SQLException {
-        return DriverManager.getConnection(URL);
-    }
+	    public Connection connect() throws SQLException {
+	        try {
+	            Class.forName("com.mysql.cj.jdbc.Driver");
+	        } catch (ClassNotFoundException e) {
+	            System.out.println("MySQL JDBC driver not found.");
+	            e.printStackTrace();
+	        }
+	        return DriverManager.getConnection(URL, username, password);
+	    }
     
     public void createTables() {
         String createGoodsTable = """

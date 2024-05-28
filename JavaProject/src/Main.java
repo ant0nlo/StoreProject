@@ -1,4 +1,6 @@
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +9,14 @@ public class Main {
     public static void main(String[] args) {
     	
     	DatabaseManager dbManager = new DatabaseManager();
+        try {
+			dbManager.connect();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
         dbManager.createTables();
         
         /*

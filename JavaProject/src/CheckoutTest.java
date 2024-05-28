@@ -37,7 +37,7 @@ class CheckoutTest {
 
     @Test
     public void testSellGoodsSuccess() {
-        checkout.sellGoods(shoppingCart);
+    	store.checkoutClient(checkout, shoppingCart);
 
         assertEquals(98, goods1.getQuantityAvailable());
         assertEquals(97, goods2.getQuantityAvailable());
@@ -47,11 +47,10 @@ class CheckoutTest {
 
     @Test
     public void testMarkGoodsSuccess() {
-        checkout.markGoods(shoppingCart);
+    	checkout.markGoods(shoppingCart);
 
         assertEquals(98, goods1.getQuantityAvailable());
         assertEquals(97, goods2.getQuantityAvailable());
-        assertEquals(1, store.getReceipts().size());
     }
     
     @Test
@@ -59,7 +58,7 @@ class CheckoutTest {
         goods1.setQuantityAvailable(1); // Not enough quantity
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            checkout.sellGoods(shoppingCart);
+        	store.checkoutClient(checkout, shoppingCart);;
         });
         assertEquals("Not enough quantity available for sale: Apple", thrown.getMessage());
     }
@@ -82,6 +81,7 @@ class CheckoutTest {
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             checkout.markGoods(shoppingCart);
+            
         });
         assertEquals("Not enough money to buy these goods.", thrown.getMessage());
     }
