@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,14 +25,14 @@ class CheckoutTest {
         store = new Store();
         Store.setMarkup(Category.EATABLE, 20); 
 
-        goods1 = new Goods(1, "Apple", 1.0,Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-        goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(7), 5, 100);
+        goods1 = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
 
         Map<Goods, Integer> items = new HashMap<>();
-        shoppingCart = new ShoppingCart(items, 100.0);
+        shoppingCart = new ShoppingCart(items, new BigDecimal("100.00"));
         shoppingCart.addItem(goods1, 2);
         shoppingCart.addItem(goods2, 3);
-        checkout = new Checkout(cashier, store);
+        checkout = new Checkout(cashier);
     }
 
     @Test
@@ -77,7 +78,7 @@ class CheckoutTest {
 
     @Test
     public void testMarkGoodsNotEnoughMoney() {
-        shoppingCart.setCustomerMoney(5.0); // Not enough money
+        shoppingCart.setCustomerMoney(new BigDecimal("5.00")); // Not enough money
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             checkout.markGoods(shoppingCart);

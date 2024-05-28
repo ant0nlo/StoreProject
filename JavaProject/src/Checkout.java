@@ -1,13 +1,12 @@
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class Checkout  {
     private Cashier cashier;
-    private Store store;
 
-    public Checkout(Cashier cashier, Store store) {
+    public Checkout(Cashier cashier) {
         this.cashier = cashier;
-        this.store = store;
     }
 
     public Receipt sellGoods(ShoppingCart shoppingCart) {
@@ -27,27 +26,26 @@ public class Checkout  {
             goods.decreaseQuantity(quantity);
         }
         
-        store.setTotalTurnover(store.getTotalTurnover() + receipt.getTotalAmountPaid());
-        store.getReceipts().add(receipt);
         receipt.saveReceiptToFile();
         return receipt;
 
     }
 
     public Receipt markGoods(ShoppingCart shoppingCart) {
-        double totalAmountToPay = 0;	
+        BigDecimal totalAmountToPay = BigDecimal.ZERO;
         Map<Goods, Integer> items = shoppingCart.getItems();
-        
+
         for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
             Goods goods = entry.getKey();
             int quantity = entry.getValue();
-            totalAmountToPay += goods.calculateSellingPrice() * quantity;
+            totalAmountToPay = totalAmountToPay.add(goods.calculateSellingPrice().multiply(BigDecimal.valueOf(quantity)));
         }
-        
-        if (shoppingCart.getCustomerMoney() < totalAmountToPay) {
+
+        if (shoppingCart.getCustomerMoney().compareTo(totalAmountToPay) < 0) {
             throw new IllegalArgumentException("Not enough money to buy these goods.");
         }
-        
-        return sellGoods(shoppingCart); 
+
+        return sellGoods(shoppingCart);
     }
+
 }

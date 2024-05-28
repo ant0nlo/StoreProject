@@ -1,4 +1,6 @@
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,7 @@ public class GoodsTest {
     public void setUp() {
         Store.setMarkup(Category.EATABLE, 20); 
 
-        goods = new Goods(1, "Apple", 1.0, Category.EATABLE,LocalDate.now().plusDays(5),5, 100);
+        goods = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
 
     }
 
@@ -33,8 +35,8 @@ public class GoodsTest {
     public void testCalculateSellingPrice() {
         Store.setMarkup(Category.EATABLE, 20); 
 
-    	double expectedSellingPrice = 1.0 * (1 + (20 / 100.0));
-        assertEquals(expectedSellingPrice, goods.calculateSellingPrice(), 0.001,
+        BigDecimal expectedSellingPrice = BigDecimal.valueOf(1.0).multiply(BigDecimal.ONE.add(BigDecimal.valueOf(20).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)));
+        assertEquals(0, expectedSellingPrice.compareTo(goods.calculateSellingPrice()), 
                      "Selling price calculation should be correct");
     }
 

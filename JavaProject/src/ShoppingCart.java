@@ -1,11 +1,12 @@
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ShoppingCart {
     private Map<Goods, Integer> items;
-    private double customerMoney;
+    private BigDecimal customerMoney;
     
-    public ShoppingCart(Map<Goods, Integer> items, double customerMoney) {
+    public ShoppingCart(Map<Goods, Integer> items, BigDecimal customerMoney) {
         this.items = new HashMap<>();
         this.customerMoney = customerMoney;
     }
@@ -14,11 +15,11 @@ public class ShoppingCart {
         return items;
     }
 
-    public double getCustomerMoney() {
+    public BigDecimal getCustomerMoney() {
         return customerMoney;
     }
 
-    public void setCustomerMoney(double customerMoney) {
+    public void setCustomerMoney(BigDecimal customerMoney) {
         this.customerMoney = customerMoney;
     }
     

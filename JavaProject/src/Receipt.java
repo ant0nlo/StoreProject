@@ -1,5 +1,6 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -10,7 +11,7 @@ public class Receipt {
     private Cashier issuingCashier;
     private LocalDateTime issuanceDateTime;
     private ShoppingCart shoppingCart;
-    private double totalAmountPaid;
+    private BigDecimal totalAmountPaid;
 
     public Receipt(Cashier issuingCashier, ShoppingCart shoppingCart) {
         this.serialNumber = serialNumberCounter++;
@@ -32,7 +33,7 @@ public class Receipt {
         return issuanceDateTime;
     }
 
-    public double getTotalAmountPaid() {
+    public BigDecimal getTotalAmountPaid() {
         return totalAmountPaid;
     }
     
@@ -48,20 +49,23 @@ public class Receipt {
         this.issuanceDateTime = issuanceDateTime;
     }
 
-    public void setTotalAmountPaid(double totalAmountPaid) {
+    public void setTotalAmountPaid(BigDecimal totalAmountPaid) {
         this.totalAmountPaid = totalAmountPaid;
     }
 
     // Method to calculate the total amount paid
     private void calculateTotalAmountPaid() {
-        totalAmountPaid = 0;
+        totalAmountPaid = BigDecimal.ZERO;
         Map<Goods, Integer> items = shoppingCart.getItems();
-        
+
         for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
             Goods goods = entry.getKey();
             int quantity = entry.getValue();
-            totalAmountPaid += goods.calculateSellingPrice() * quantity;
+            BigDecimal itemTotal = goods.calculateSellingPrice().multiply(BigDecimal.valueOf(quantity));
+            totalAmountPaid = totalAmountPaid.add(itemTotal);
         }
+
+        totalAmountPaid = totalAmountPaid.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     // Method to generate receipt content
@@ -105,7 +109,7 @@ public class Receipt {
         			  .append("\n");
         receiptContent.append("Change:")
         			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
-        			  .append(" $").append(String.format("%.2f", shoppingCart.getCustomerMoney() - totalAmountPaid))
+        			  .append(" $").append(shoppingCart.getCustomerMoney().subtract(totalAmountPaid) )
         			  .append("\n");
         
         return receiptContent.toString();

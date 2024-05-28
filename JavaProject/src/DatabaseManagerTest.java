@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testAddGoods() {
-        Goods goods = new Goods(1, "Apple Juice", 1.56, Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods = new Goods(1, "Apple Juice", new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
         dbManager.addGoods(goods);
 
         try (Connection conn = dbManager.connect();
@@ -92,7 +93,7 @@ public class DatabaseManagerTest {
         Cashier cashier = new Cashier(1, "Jane Smith", 1500);
         dbManager.addCashier(cashier);
 
-        Goods goods = new Goods(1, "Apple", 1.0, Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods = new Goods(1, "Apple",new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
         dbManager.addGoods(goods);
 
         Store store = new Store();
@@ -101,9 +102,9 @@ public class DatabaseManagerTest {
 
         Store.setMarkup(Category.EATABLE, 20); 
         Map<Goods, Integer> items = new HashMap<>();
-        ShoppingCart shoppingCart = new ShoppingCart(items, 200.00);
+        ShoppingCart shoppingCart = new ShoppingCart(items, new BigDecimal("200.00"));
         shoppingCart.addItem(goods, 5);
-        Checkout checkout = new Checkout(cashier, store);
+        Checkout checkout = new Checkout(cashier);
         Receipt receipt = checkout.markGoods(shoppingCart);
 
         dbManager.addReceipt(receipt);
@@ -129,7 +130,7 @@ public class DatabaseManagerTest {
         Cashier cashier = new Cashier(1, "Jane Smith", 1500);
         dbManager.addCashier(cashier);
 
-        Goods goods = new Goods(1, "Apple", 1.0, Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
         dbManager.addGoods(goods);
 
         Store store = new Store();
@@ -137,10 +138,10 @@ public class DatabaseManagerTest {
         store.addGoods(goods);
 
         Map<Goods, Integer> items = new HashMap<>();
-        ShoppingCart shoppingCart = new ShoppingCart(items, 200.00);
+        ShoppingCart shoppingCart = new ShoppingCart(items, new BigDecimal("200.00"));
         shoppingCart.addItem(goods, 5);
 
-        Checkout checkout = new Checkout(cashier, store);
+        Checkout checkout = new Checkout(cashier);
         Receipt receipt = checkout.markGoods(shoppingCart);
 
         dbManager.addReceipt(receipt);

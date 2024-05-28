@@ -1,18 +1,20 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class Goods {
     private int id;
     private String name;
-    private double unitDeliveryPrice;
+    private BigDecimal unitDeliveryPrice;
     private Category category;
     private LocalDate expirationDate;
     private double discountPercentage;
     private double markupPercentage;
-    private int totalAvailable;
+    private int totalDelivered;
     private int quantityAvailable;
 
-    public Goods(int id, String name, double unitDeliveryPrice, Category category, LocalDate expirationDate,
+    public Goods(int id, String name, BigDecimal unitDeliveryPrice, Category category, LocalDate expirationDate,
     		double discountPercentage, int totalAvailable) {
         this.id = id;
         this.name = name;
@@ -21,7 +23,7 @@ public class Goods {
         this.expirationDate = expirationDate;
         this.discountPercentage = discountPercentage;
         this.markupPercentage = category.getValue();
-        this.totalAvailable = totalAvailable;
+        this.totalDelivered = totalAvailable;
         this.quantityAvailable = totalAvailable;
     }
     
@@ -37,10 +39,10 @@ public class Goods {
     public void setName(String name) {
         this.name = name;
     }
-    public double getUnitDeliveryPrice() {
+    public BigDecimal getUnitDeliveryPrice() {
         return unitDeliveryPrice;
     }
-    public void setUnitDeliveryPrice(double unitDeliveryPrice) {
+    public void setUnitDeliveryPrice(BigDecimal unitDeliveryPrice) {
         this.unitDeliveryPrice = unitDeliveryPrice;
     }
     public Category getCategory() {
@@ -73,11 +75,11 @@ public class Goods {
     public void setQuantityAvailable(int quantityAvailable) {
         this.quantityAvailable = quantityAvailable;
     }
-    public int getTotalAvailable() {
-        return totalAvailable;
+    public int getTotalDelivered() {
+        return totalDelivered;
     }
-    public void setTotalAvailable(int totalAvailable) {
-        this.totalAvailable = totalAvailable;
+    public void setTotalDelivered(int totalAvailable) {
+        this.totalDelivered = totalAvailable;
     }
 
     public Goods getGoods() {
@@ -98,19 +100,18 @@ public class Goods {
     }
 
     // Method to calculate selling price
-    public double calculateSellingPrice() {
-        double markupPercentage;
-        if (category != null) {
-        	markupPercentage = Store.getMarkup(category);
-        } else {
-            throw new IllegalArgumentException("Invalid category");
+    public BigDecimal calculateSellingPrice() {
+        BigDecimal markupPercentage = BigDecimal.valueOf(Store.getMarkup(category));
+        BigDecimal sellingPrice = unitDeliveryPrice.multiply(
+                BigDecimal.ONE.add(markupPercentage.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP))
+        );
+
+        if (expirationDate != null && LocalDate.now().isAfter(expirationDate.minusDays(3))) {
+            BigDecimal discount = BigDecimal.valueOf(discountPercentage).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            sellingPrice = sellingPrice.multiply(BigDecimal.ONE.subtract(discount));
         }
 
-        double sellingPrice = unitDeliveryPrice * (1 + markupPercentage / 100);
-        if (expirationDate != null && LocalDate.now().isAfter(expirationDate.minusDays(3))) {
-            sellingPrice *= (1 - discountPercentage / 100);
-        }
-        return sellingPrice;
+        return sellingPrice.setScale(2, RoundingMode.HALF_UP);
     }
      
     @Override

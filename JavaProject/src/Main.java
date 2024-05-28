@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +31,8 @@ public class Main {
         dbManager.addCashier(cashier2);
 
         // Adding goods
-        Goods goods1 = new Goods(1, "Apple", 1.56, Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
-        Goods goods2 = new Goods(2, "Milk", 2.0, Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
+        Goods goods1 = new Goods(1, "Apple",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
+        Goods goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
         store.addGoods(goods1);
         store.addGoods(goods2);
         
@@ -42,47 +43,48 @@ public class Main {
         
         // First cart
         Map<Goods, Integer> items = new HashMap<>();
-        ShoppingCart cart = new ShoppingCart(items, 200.55);
+        ShoppingCart cart = new ShoppingCart(items,  new BigDecimal("200.55"));
         cart.addItem(goods1, 20);
         cart.addItem(goods2, 10);
-        Checkout checkout = new Checkout(cashier2, store);
-        Receipt receipt = checkout.markGoods(cart);
+        Checkout checkout = new Checkout(cashier2);
+        Receipt receipt = store.checkoutClient(checkout, cart);   
+        
         dbManager.addReceipt(receipt);
         dbManager.addItemToShoppingCart(cart, receipt);
-        
+               
         // Second cart
         Map<Goods, Integer> items1 = new HashMap<>();
-        ShoppingCart cart1 = new ShoppingCart(items1, 150.25);
+        ShoppingCart cart1 = new ShoppingCart(items1,  new BigDecimal("150.25"));
         cart1.addItem(goods1, 10);
         cart1.addItem(goods2, 5);
-        Checkout checkout1 = new Checkout(cashier1, store);
-        Receipt receipt1 = checkout1.markGoods(cart1);
+        Checkout checkout1 = new Checkout(cashier1);
+        Receipt receipt1 = store.checkoutClient(checkout1, cart1);
         dbManager.addReceipt(receipt1);
         dbManager.addItemToShoppingCart(cart1, receipt1);
         
         // Third cart
         Map<Goods, Integer> items2 = new HashMap<>();
-        ShoppingCart cart2 = new ShoppingCart(items2, 300.75);
+        ShoppingCart cart2 = new ShoppingCart(items2, new BigDecimal("300.75"));
         cart2.addItem(goods1, 15);
         cart2.addItem(goods2, 8);
-        Checkout checkout2 = new Checkout(cashier2, store);
-        Receipt receipt2 = checkout2.markGoods(cart2);
+        Checkout checkout2 = new Checkout(cashier2);
+        Receipt receipt2 = store.checkoutClient(checkout2, cart2);
         dbManager.addReceipt(receipt2);
         dbManager.addItemToShoppingCart(cart2, receipt2);
         
         // Fourth cart
         Map<Goods, Integer> items3 = new HashMap<>();
-        ShoppingCart cart3 = new ShoppingCart(items3, 500.50);
+        ShoppingCart cart3 = new ShoppingCart(items3, new BigDecimal("500.50"));
         cart3.addItem(goods1, 30);
         cart3.addItem(goods2, 20);
-        Checkout checkout3 = new Checkout(cashier1, store);
-        Receipt receipt3 = checkout3.markGoods(cart3);
+        Checkout checkout3 = new Checkout(cashier1);
+        Receipt receipt3 = store.checkoutClient(checkout3, cart3);
         dbManager.addReceipt(receipt3);
         dbManager.addItemToShoppingCart(cart3, receipt3);
 
         // Viewing financial information
         System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());
-        System.out.println("Total revenue: $" + store.calculateTotalRevenue());
+        System.out.println("Total revenue: $" + store.getTotalTurnover());
         System.out.println("Total profit: $" + store.calculateTotalProfit());
         System.out.println("Total number of receipts issued: " + store.getTotalReceiptsIssued());
     }

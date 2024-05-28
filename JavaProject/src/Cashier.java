@@ -62,4 +62,5 @@ public class Cashier {
                 ", monthlySalary=" + monthlySalary +
                 '}';
     }
+
 }

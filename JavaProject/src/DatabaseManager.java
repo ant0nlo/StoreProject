@@ -77,12 +77,12 @@ public class DatabaseManager {
             if (rs.next()) {
                 // If the goods exist, update it
                 pstmtUpdate.setString(1, goods.getName());
-                pstmtUpdate.setDouble(2, goods.getUnitDeliveryPrice());
+                pstmtUpdate.setBigDecimal(2, goods.getUnitDeliveryPrice());
                 pstmtUpdate.setString(3, goods.getCategory().toString());
                 pstmtUpdate.setString(4, goods.getExpirationDate() != null ? goods.getExpirationDate().toString() : null);
                 pstmtUpdate.setDouble(5, goods.getMarkupPercentage());
                 pstmtUpdate.setDouble(6, goods.getDiscountPercentage());
-                pstmtUpdate.setInt(7, goods.getTotalAvailable());
+                pstmtUpdate.setInt(7, goods.getTotalDelivered());
                 pstmtUpdate.setInt(8, goods.getQuantityAvailable());
                 pstmtUpdate.setInt(9, goods.getId());
                 pstmtUpdate.executeUpdate();
@@ -90,12 +90,12 @@ public class DatabaseManager {
                 // If the goods do not exist, insert it
                 pstmtInsert.setInt(1, goods.getId());
                 pstmtInsert.setString(2, goods.getName());
-                pstmtInsert.setDouble(3, goods.getUnitDeliveryPrice());
+                pstmtInsert.setBigDecimal(3, goods.getUnitDeliveryPrice());
                 pstmtInsert.setString(4, goods.getCategory().toString());
                 pstmtInsert.setString(5, goods.getExpirationDate() != null ? goods.getExpirationDate().toString() : null);
                 pstmtInsert.setDouble(6, goods.getMarkupPercentage());
                 pstmtInsert.setDouble(7, goods.getDiscountPercentage());
-                pstmtInsert.setInt(8, goods.getTotalAvailable());
+                pstmtInsert.setInt(8, goods.getTotalDelivered());
                 pstmtInsert.setInt(9, goods.getQuantityAvailable());
                 pstmtInsert.executeUpdate();
             }
@@ -150,14 +150,14 @@ public class DatabaseManager {
             if (rs.next()) {
                 pstmtUpdate.setInt(1, receipt.getIssuingCashier().getId());
                 pstmtUpdate.setString(2, receipt.getIssuanceDateTime().toString());
-                pstmtUpdate.setDouble(3, receipt.getTotalAmountPaid());
+                pstmtUpdate.setBigDecimal(3, receipt.getTotalAmountPaid());
                 pstmtUpdate.setInt(4, receipt.getSerialNumber());
                 pstmtUpdate.executeUpdate();
             } else {
                 pstmtInsert.setInt(1, receipt.getSerialNumber());
                 pstmtInsert.setInt(2, receipt.getIssuingCashier().getId());
                 pstmtInsert.setString(3, receipt.getIssuanceDateTime().toString());
-                pstmtInsert.setDouble(4, receipt.getTotalAmountPaid());
+                pstmtUpdate.setBigDecimal(4, receipt.getTotalAmountPaid());
                 pstmtInsert.executeUpdate();
             }
         } catch (SQLException e) {

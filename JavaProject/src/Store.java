@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -5,13 +6,13 @@ public class Store {
     private Set<Cashier> cashiers;
     private Set<Receipt> receipts;
     private Map<Integer, Goods> goodsMap;
-    private double totalTurnover;
+    private BigDecimal totalTurnover;
 
     public Store() {
         this.cashiers = new HashSet<>();
         this.goodsMap = new HashMap<>();
         this.receipts = new HashSet<>();
-        this.totalTurnover = 0;
+        this.totalTurnover = BigDecimal.ZERO;
     }
     
     public void addCashier(Cashier cashier) {
@@ -36,30 +37,26 @@ public class Store {
     }
 
     // Method to calculate total costs for cashiers' salaries
-    public double calculateTotalCashierSalaries() {
-        double totalSalaries = 0;
-        for (Cashier cashier : cashiers) {
-            totalSalaries += cashier.getMonthlySalary() * 12; // Assuming annual salary
-        }
-        return totalSalaries;
+    public BigDecimal calculateTotalCashierSalaries() {
+    	 BigDecimal totalSalaries = BigDecimal.ZERO;
+         for (Cashier cashier : cashiers) {
+             totalSalaries = totalSalaries.add(BigDecimal.valueOf(cashier.getMonthlySalary()).multiply(BigDecimal.valueOf(12)));
+         }
+         return totalSalaries;
     }
 
     // Method to calculate total costs for goods delivery
-    public double calculateTotalDeliveryCosts() {
-        double totalDeliveryCosts = 0;
+    public BigDecimal calculateTotalDeliveryCosts() {
+        BigDecimal totalDeliveryCosts = BigDecimal.ZERO;
         for (Goods goods : goodsMap.values()) {
-            totalDeliveryCosts += goods.getUnitDeliveryPrice() * goods.getTotalAvailable();
+            totalDeliveryCosts = totalDeliveryCosts.add(goods.getUnitDeliveryPrice().multiply(BigDecimal.valueOf(goods.getTotalDelivered())));
         }
         return totalDeliveryCosts;
     }
 
-    public double calculateTotalRevenue() {
-        return totalTurnover;
-    }
-
     // Method to calculate total profit
-    public double calculateTotalProfit() {
-        return calculateTotalRevenue() - calculateTotalCashierSalaries() - calculateTotalDeliveryCosts();
+    public BigDecimal calculateTotalProfit() {
+        return getTotalTurnover().subtract(calculateTotalCashierSalaries()).subtract(calculateTotalDeliveryCosts());
     }
 
     // Method to get total number of receipts issued
@@ -75,11 +72,11 @@ public class Store {
 		this.receipts = receipts;
 	}
 	
-	public double getTotalTurnover() {
+	public BigDecimal getTotalTurnover() {
 		return totalTurnover;
 	}
 
-	public void setTotalTurnover(double totalTurnover) {
+	public void setTotalTurnover(BigDecimal totalTurnover) {
 		this.totalTurnover = totalTurnover;
 	}
 	
@@ -98,4 +95,12 @@ public class Store {
     public void setDiscountPercentageInStore(Goods good, double discountPercentage) {
     	good.setDiscountPercentage(discountPercentage);
     }
+    
+    public Receipt checkoutClient(Checkout checkout, ShoppingCart cart) {
+        Receipt receipt = checkout.markGoods(cart);
+        totalTurnover = totalTurnover.add(receipt.getTotalAmountPaid());
+        receipts.add(receipt);
+        return receipt;
+    }
+
 }
