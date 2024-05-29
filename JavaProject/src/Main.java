@@ -1,5 +1,4 @@
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -12,19 +11,9 @@ public class Main {
         try {
 			dbManager.connect();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
-        dbManager.createTables();
-        
-        /*
-        dbManager.deleteAllGoods();
-        dbManager.deleteAllCashiers();
-        dbManager.deleteAllReceipts();
-        dbManager.deleteAllShoppingCartItems();
-        */
+        //dbManager.createTables();
         
         // Creating store
         Store store = new Store();
@@ -32,7 +21,7 @@ public class Main {
         Store.setMarkup(Category.NON_EDIBLE, 10); 
 
         // Adding cashiers
-        Cashier cashier1 = new Cashier(1, "John Doe", 3000);
+        Cashier cashier1 = new Cashier(1, "John Doe", 1000);
         Cashier cashier2 = new Cashier(2, "Anna Smith", 1200);
         store.addCashier(cashier1);
         store.addCashier(cashier2);
@@ -45,7 +34,7 @@ public class Main {
         Goods goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
         store.addGoods(goods1);
         store.addGoods(goods2);
-        
+
         dbManager.addGoods(goods1);
         dbManager.addGoods(goods2);
         

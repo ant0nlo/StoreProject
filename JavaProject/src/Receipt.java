@@ -90,12 +90,26 @@ public class Receipt {
             Goods goods = entry.getKey();
             int quantity = entry.getValue();
             
-            receiptContent.append("-" + quantity + " ")
+            if (goods.getName().length() <= 15) {
+            	receiptContent.append("-" + quantity + " ")
             			  .append(goods.getName())
             			  .append(numberOfSpaces(goods.getName()))
             			  .append(" $")
             			  .append(goods.getUnitDeliveryPrice())
             			  .append("\n");
+            } else {
+            	
+            	String[] nameParts = splitName(goods.getName());
+            	receiptContent.append("-" + quantity + " ")
+        	    			  .append(nameParts[0]).append("\n")
+        	                  .append(nameParts[1])
+        	                  .append(numberOfSpaces(nameParts[1]))
+        	                  .append(numberOfSpaces(goods.getName()))
+                			  .append(" $")
+                			  .append(goods.getUnitDeliveryPrice())
+                			  .append("\n");
+            }
+            
         }
         receiptContent.append(String.valueOf("=").repeat(25));
         
@@ -115,10 +129,16 @@ public class Receipt {
         return receiptContent.toString();
     }
 
+    public String[] splitName(String name) {
+        // Разделяне на името на стоката на две части
+        int middleIndex = name.length() / 2;
+        String[] parts = {name.substring(0, middleIndex), name.substring(middleIndex)};
+        return parts;
+    }
     // Method for the spaces
     public String numberOfSpaces(Object getNameResult) {
     	String valueAsString = String.valueOf(getNameResult);
-        int spacesNeeded = Math.max(0, 15 - valueAsString.length());
+        int spacesNeeded = 15 - valueAsString.length();
         StringBuilder spaces = new StringBuilder();
         for (int i = 0; i < spacesNeeded; i++) {
             spaces.append(" ");

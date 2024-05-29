@@ -40,4 +40,16 @@ public class GoodsTest {
                      "Selling price calculation should be correct");
     }
 
+    @Test
+    public void testEquals() {
+        Goods sameGoods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        Goods differentGoods = new Goods(2, "Orange", new BigDecimal("1.50"), Category.EATABLE, LocalDate.now().plusDays(3), 5, 100);
+        Goods sameIdDifferentName = new Goods(1, "Orange", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+
+        assertTrue(goods.equals(sameGoods), "Goods should be equal to another goods with the same ID");
+        assertFalse(goods.equals(differentGoods), "Goods should not be equal to another goods with a different ID");
+        assertTrue(goods.equals(sameIdDifferentName), "Goods should be equal to another goods with the same ID but different name");
+    }
+
+    
 }

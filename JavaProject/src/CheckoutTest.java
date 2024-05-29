@@ -27,7 +27,9 @@ class CheckoutTest {
 
         goods1 = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
         goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-
+        store.addGoods(goods1);
+        store.addGoods(goods2);
+        
         Map<Goods, Integer> items = new HashMap<>();
         shoppingCart = new ShoppingCart(items, new BigDecimal("100.00"));
         shoppingCart.addItem(goods1, 2);
@@ -37,20 +39,13 @@ class CheckoutTest {
 
     @Test
     public void testSellGoodsSuccess() {
-    	store.checkoutClient(checkout, shoppingCart);
+    	Receipt receipt = store.checkoutClient(checkout, shoppingCart);
 
         assertEquals(98, goods1.getQuantityAvailable());
         assertEquals(97, goods2.getQuantityAvailable());
+        assertEquals(new BigDecimal("9.60"), receipt.getTotalAmountPaid());
         assertEquals(1, store.getReceipts().size());
-    }
 
-
-    @Test
-    public void testMarkGoodsSuccess() {
-    	checkout.markGoods(shoppingCart);
-
-        assertEquals(98, goods1.getQuantityAvailable());
-        assertEquals(97, goods2.getQuantityAvailable());
     }
     
     @Test
@@ -58,7 +53,7 @@ class CheckoutTest {
         goods1.setQuantityAvailable(1); // Not enough quantity
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-        	store.checkoutClient(checkout, shoppingCart);;
+        	store.checkoutClient(checkout, shoppingCart);
         });
         assertEquals("Not enough quantity available for sale: Apple", thrown.getMessage());
     }
@@ -68,7 +63,7 @@ class CheckoutTest {
         store.setExpirationDateInStore(goods1, LocalDate.now().minusDays(1)); // Item expired
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            checkout.sellGoods(shoppingCart);
+        	store.checkoutClient(checkout, shoppingCart);
         });
         assertEquals("The item Apple has expired and cannot be sold.", thrown.getMessage());
     }
@@ -76,7 +71,7 @@ class CheckoutTest {
     
 
     @Test
-    public void testMarkGoodsNotEnoughMoney() {
+    public void testSellGoodsNotEnoughMoney() {
         shoppingCart.setCustomerMoney(new BigDecimal("5.00")); // Not enough money
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {

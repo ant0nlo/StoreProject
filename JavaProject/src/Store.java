@@ -63,6 +63,13 @@ public class Store {
     public int getTotalReceiptsIssued() {
         return getReceipts().size();
     }
+    
+    public Receipt checkoutClient(Checkout checkout, ShoppingCart cart) {
+        Receipt receipt = checkout.markGoods(cart);
+        totalTurnover = totalTurnover.add(receipt.getTotalAmountPaid());
+        receipts.add(receipt);
+        return receipt;
+    }
 
 	public Set<Receipt> getReceipts() {
 		return receipts;
@@ -96,11 +103,5 @@ public class Store {
     	good.setDiscountPercentage(discountPercentage);
     }
     
-    public Receipt checkoutClient(Checkout checkout, ShoppingCart cart) {
-        Receipt receipt = checkout.markGoods(cart);
-        totalTurnover = totalTurnover.add(receipt.getTotalAmountPaid());
-        receipts.add(receipt);
-        return receipt;
-    }
 
 }

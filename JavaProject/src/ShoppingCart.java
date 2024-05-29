@@ -7,7 +7,7 @@ public class ShoppingCart {
     private BigDecimal customerMoney;
     
     public ShoppingCart(Map<Goods, Integer> items, BigDecimal customerMoney) {
-        this.items = new HashMap<>();
+        this.items = items;
         this.customerMoney = customerMoney;
     }
     

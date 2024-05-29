@@ -4,7 +4,7 @@ import java.util.Map;
 public class DatabaseManager {
 	 String URL = "jdbc:mysql://localhost:3306/mydb";
 	 String username = "root";
-	 String password = "123";
+	 String password = "5842";
 
 	    public Connection connect() throws SQLException {
 	        try {
@@ -41,7 +41,7 @@ public class DatabaseManager {
         
         String createReceiptsTable = """
             CREATE TABLE IF NOT EXISTS Receipts (
-                serialNumber INTEGER PRIMARY KEY AUTOINCREMENT,
+                serialNumber INTEGER PRIMARY KEY AUTO_INCREMENT,
                 cashierId INTEGER,
                 issuanceDateTime TEXT NOT NULL,
                 totalAmountPaid REAL NOT NULL,
@@ -156,16 +156,18 @@ public class DatabaseManager {
             ResultSet rs = pstmtSelect.executeQuery();
             
             if (rs.next()) {
+                // Update the existing record
                 pstmtUpdate.setInt(1, receipt.getIssuingCashier().getId());
                 pstmtUpdate.setString(2, receipt.getIssuanceDateTime().toString());
                 pstmtUpdate.setBigDecimal(3, receipt.getTotalAmountPaid());
                 pstmtUpdate.setInt(4, receipt.getSerialNumber());
                 pstmtUpdate.executeUpdate();
             } else {
+                // Insert a new record
                 pstmtInsert.setInt(1, receipt.getSerialNumber());
                 pstmtInsert.setInt(2, receipt.getIssuingCashier().getId());
                 pstmtInsert.setString(3, receipt.getIssuanceDateTime().toString());
-                pstmtUpdate.setBigDecimal(4, receipt.getTotalAmountPaid());
+                pstmtInsert.setBigDecimal(4, receipt.getTotalAmountPaid());
                 pstmtInsert.executeUpdate();
             }
         } catch (SQLException e) {
@@ -179,38 +181,62 @@ public class DatabaseManager {
         String sqlInsert = "INSERT INTO ShoppingCartItems(receiptSerialNumber, goodsId, quantity) VALUES(?,?,?)";
         String sqlUpdate = "UPDATE ShoppingCartItems SET quantity = ? WHERE receiptSerialNumber = ? AND goodsId = ?";
 
-        try (Connection conn = connect(); 
-             PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
-             PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
-             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
-            
+        Connection conn = null;
+
+        try {
+            conn = connect(); 
             conn.setAutoCommit(false);  // Start transaction
 
-            for (Map.Entry<Goods, Integer> entry : shoppingCart.getItems().entrySet()) {
-                pstmtSelect.setInt(1, receipt.getSerialNumber());
-                pstmtSelect.setInt(2, entry.getKey().getId());
-                ResultSet rs = pstmtSelect.executeQuery();
-                
-                if (rs.next()) {
-                    pstmtUpdate.setInt(1, entry.getValue());
-                    pstmtUpdate.setInt(2, receipt.getSerialNumber());
-                    pstmtUpdate.setInt(3, entry.getKey().getId());
-                    pstmtUpdate.addBatch();
-                } else {
-                    pstmtInsert.setInt(1, receipt.getSerialNumber());
-                    pstmtInsert.setInt(2, entry.getKey().getId());
-                    pstmtInsert.setInt(3, entry.getValue());
-                    pstmtInsert.addBatch();
+            try (PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
+                 PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
+                 PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
+
+                for (Map.Entry<Goods, Integer> entry : shoppingCart.getItems().entrySet()) {
+                    pstmtSelect.setInt(1, receipt.getSerialNumber());
+                    pstmtSelect.setInt(2, entry.getKey().getId());
+                    ResultSet rs = pstmtSelect.executeQuery();
+
+                    if (rs.next()) {
+                        pstmtUpdate.setInt(1, entry.getValue());
+                        pstmtUpdate.setInt(2, receipt.getSerialNumber());
+                        pstmtUpdate.setInt(3, entry.getKey().getId());
+                        pstmtUpdate.addBatch();
+                    } else {
+                        pstmtInsert.setInt(1, receipt.getSerialNumber());
+                        pstmtInsert.setInt(2, entry.getKey().getId());
+                        pstmtInsert.setInt(3, entry.getValue());
+                        pstmtInsert.addBatch();
+                    }
+                }
+
+                pstmtInsert.executeBatch();
+                pstmtUpdate.executeBatch();
+                conn.commit();  // Commit transaction
+
+            } catch (SQLException e) {
+                System.out.println("Error adding or updating items to shopping cart: " + e.getMessage());
+                if (conn != null) {
+                    try {
+                        conn.rollback();  // Rollback transaction on error
+                    } catch (SQLException rollbackException) {
+                        System.out.println("Error during rollback: " + rollbackException.getMessage());
+                    }
                 }
             }
-
-            pstmtInsert.executeBatch();
-            pstmtUpdate.executeBatch();
-            conn.commit();  // Commit transaction
         } catch (SQLException e) {
-            System.out.println("Error adding or updating items to shopping cart: " + e.getMessage());
+            System.out.println("Connection error: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println("Error closing connection: " + e.getMessage());
+                }
+            }
         }
     }
+
     
     public void deleteAllGoods() {
         String sql = "DELETE FROM Goods";

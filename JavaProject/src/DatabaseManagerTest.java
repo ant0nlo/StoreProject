@@ -15,6 +15,7 @@ public class DatabaseManagerTest {
 
     @BeforeEach
     public void setUp() {
+    	
         dbManager = new DatabaseManager();
         dbManager.createTables();
     }
