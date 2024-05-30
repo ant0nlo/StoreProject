@@ -6,13 +6,13 @@ public class Store {
     private Set<Cashier> cashiers;
     private Set<Receipt> receipts;
     private Map<Integer, Goods> deliveredGoods;
-    private Map<Integer, Integer> soldGoods;  // Map to store sold goods and their quantities	
+    private Map<Integer, Integer> soldGoods;
     private BigDecimal totalTurnover;
 
     public Store() {
         this.cashiers = new HashSet<>();
         this.deliveredGoods = new HashMap<>();
-        this.soldGoods = new HashMap<>();  // Initialize the soldGoods map
+        this.soldGoods = new HashMap<>();
         this.receipts = new HashSet<>();
         this.totalTurnover = BigDecimal.ZERO;
     }
