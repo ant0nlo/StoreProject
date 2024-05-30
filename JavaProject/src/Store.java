@@ -5,12 +5,14 @@ import java.util.*;
 public class Store {
     private Set<Cashier> cashiers;
     private Set<Receipt> receipts;
-    private Map<Integer, Goods> goodsMap;
+    private Map<Integer, Goods> deliveredGoods;
+    private Map<Integer, Integer> soldGoods;  // Map to store sold goods and their quantities	
     private BigDecimal totalTurnover;
 
     public Store() {
         this.cashiers = new HashSet<>();
-        this.goodsMap = new HashMap<>();
+        this.deliveredGoods = new HashMap<>();
+        this.soldGoods = new HashMap<>();  // Initialize the soldGoods map
         this.receipts = new HashSet<>();
         this.totalTurnover = BigDecimal.ZERO;
     }
@@ -20,11 +22,11 @@ public class Store {
     }
 
     public void addGoods(Goods goods) {
-        goodsMap.put(goods.getId(), goods);
+        deliveredGoods.put(goods.getId(), goods);
     }
 
     public Goods getGoodsById(int id) {
-        return goodsMap.get(id);
+        return deliveredGoods.get(id);
     }
 
     // Method to check goods availability
@@ -48,7 +50,7 @@ public class Store {
     // Method to calculate total costs for goods delivery
     public BigDecimal calculateTotalDeliveryCosts() {
         BigDecimal totalDeliveryCosts = BigDecimal.ZERO;
-        for (Goods goods : goodsMap.values()) {
+        for (Goods goods : deliveredGoods.values()) {
             totalDeliveryCosts = totalDeliveryCosts.add(goods.getUnitDeliveryPrice().multiply(BigDecimal.valueOf(goods.getTotalDelivered())));
         }
         return totalDeliveryCosts;
@@ -64,10 +66,26 @@ public class Store {
         return getReceipts().size();
     }
     
+    public Map<Integer, Integer> getSoldGoods() {
+        return soldGoods;
+    }
+    
+    // Method to add sold goods
+    private void addSoldGoods(Goods goods, int quantitySold) {
+        soldGoods.merge(goods.getId(), quantitySold, Integer::sum);
+    }
+    
     public Receipt checkoutClient(Checkout checkout, ShoppingCart cart) {
         Receipt receipt = checkout.markGoods(cart);
         totalTurnover = totalTurnover.add(receipt.getTotalAmountPaid());
         receipts.add(receipt);
+
+        for (Map.Entry<Goods, Integer> entry : cart.getItems().entrySet()) {
+            Goods goods = entry.getKey();
+            int quantity = entry.getValue();
+            addSoldGoods(goods, quantity);
+        }
+        
         return receipt;
     }
 

@@ -1,6 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -65,7 +66,7 @@ public class Receipt {
             totalAmountPaid = totalAmountPaid.add(itemTotal);
         }
 
-        totalAmountPaid = totalAmountPaid.setScale(2, BigDecimal.ROUND_HALF_UP);
+        totalAmountPaid = totalAmountPaid.setScale(2, RoundingMode.HALF_UP);
     }
 
     // Method to generate receipt content
@@ -90,24 +91,14 @@ public class Receipt {
             Goods goods = entry.getKey();
             int quantity = entry.getValue();
             
-            if (goods.getName().length() <= 15) {
-            	receiptContent.append("-" + quantity + " ")
-            			  .append(goods.getName())
-            			  .append(numberOfSpaces(goods.getName()))
-            			  .append(" $")
-            			  .append(goods.getUnitDeliveryPrice())
-            			  .append("\n");
-            } else {
-            	
-            	String[] nameParts = splitName(goods.getName());
-            	receiptContent.append("-" + quantity + " ")
-        	    			  .append(nameParts[0]).append("\n")
-        	                  .append(nameParts[1])
-        	                  .append(numberOfSpaces(nameParts[1]))
-        	                  .append(numberOfSpaces(goods.getName()))
-                			  .append(" $")
-                			  .append(goods.getUnitDeliveryPrice())
-                			  .append("\n");
+            String[] nameParts = splitName(goods.getName());
+            receiptContent.append("-").append(quantity).append(" ");
+            for (String part : nameParts) {
+            	receiptContent.append(part).append(numberOfSpaces(part)).append(" ");
+                if (part.equals(nameParts[nameParts.length - 1])) {
+                    receiptContent.append(" $").append(goods.getUnitDeliveryPrice());
+                }
+                receiptContent.append("\n");
             }
             
         }
@@ -129,12 +120,26 @@ public class Receipt {
         return receiptContent.toString();
     }
 
-    public String[] splitName(String name) {
-        // Разделяне на името на стоката на две части
+    private String[] splitName(String name) {
+        if (name.length() <= 15) {
+            return new String[] {name};
+        }
+
         int middleIndex = name.length() / 2;
-        String[] parts = {name.substring(0, middleIndex), name.substring(middleIndex)};
-        return parts;
+        int splitIndex = middleIndex;
+        // Търсим интервал най-близо до средата, но не след средата
+        while (splitIndex > 0 && name.charAt(splitIndex) != ' ') {
+            splitIndex--;
+        }
+        // Ако няма интервал, който да разделя текста преди средата, използваме средата
+        if (splitIndex == 0) {
+            splitIndex = middleIndex;
+        }
+        String firstPart = name.substring(0, splitIndex).trim();
+        String secondPart = name.substring(splitIndex).trim();
+        return new String[] {firstPart, secondPart};
     }
+
     // Method for the spaces
     public String numberOfSpaces(Object getNameResult) {
     	String valueAsString = String.valueOf(getNameResult);
@@ -148,7 +153,7 @@ public class Receipt {
     
     // Method to save receipt to a file
     public void saveReceiptToFile() {
-        String filename = "Receipt_" + serialNumber + ".txt";
+        String filename = "Receipts/Receipt_" + serialNumber + ".txt";
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write(generateReceiptContent());
         } catch (IOException e) {

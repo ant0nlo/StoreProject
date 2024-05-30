@@ -1,0 +1,15 @@
+         RECEIPT
+=========================
+Serial Number: 4
+Issued by: John Doe
+-------------------------
+Date: 2024-05-30
+Time: 11:25:10
+-------------------------
+-30 Apple pie       
+with strawberry  $1.56
+-20 Milk             $2.00
+=========================
+ TOTAL:          $104.10
+Cash:            $500.50
+Change:          $396.40

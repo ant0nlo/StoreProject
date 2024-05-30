@@ -1,0 +1,15 @@
+         RECEIPT
+=========================
+Serial Number: 1
+Issued by: Anna Smith
+-------------------------
+Date: 2024-05-30
+Time: 11:25:09
+-------------------------
+-20 Apple pie       
+with strawberry  $1.56
+-10 Milk             $2.00
+=========================
+ TOTAL:          $61.40
+Cash:            $200.55
+Change:          $139.15

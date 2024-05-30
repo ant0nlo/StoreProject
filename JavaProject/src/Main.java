@@ -30,7 +30,7 @@ public class Main {
         dbManager.addCashier(cashier2);
 
         // Adding goods
-        Goods goods1 = new Goods(1, "Apple",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
+        Goods goods1 = new Goods(1, "Apple pie with strawberry",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
         Goods goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
         store.addGoods(goods1);
         store.addGoods(goods2);
@@ -80,7 +80,7 @@ public class Main {
         Receipt receipt3 = store.checkoutClient(checkout3, cart3);
         dbManager.addReceipt(receipt3);
         dbManager.addItemToShoppingCart(cart3, receipt3);
-
+        
         // Viewing financial information
         System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());
         System.out.println("Total revenue: $" + store.getTotalTurnover());
