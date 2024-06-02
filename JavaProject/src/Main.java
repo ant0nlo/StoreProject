@@ -13,13 +13,14 @@ public class Main {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        //dbManager.createTables();
+        dbManager.createTables();
         
         // Creating store
         Store store = new Store();
-        Store.setMarkup(Category.EATABLE, 20); 
-        Store.setMarkup(Category.NON_EDIBLE, 10); 
+        store.setMarkup(Category.EATABLE, 20); 
+        store.setMarkup(Category.NON_EDIBLE, 10); 
 
+        
         // Adding cashiers
         Cashier cashier1 = new Cashier(1, "John Doe", 1000);
         Cashier cashier2 = new Cashier(2, "Anna Smith", 1200);
@@ -30,7 +31,7 @@ public class Main {
         dbManager.addCashier(cashier2);
 
         // Adding goods
-        Goods goods1 = new Goods(1, "Apple pie with strawberry",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
+        Goods goods1 = new Goods(1, "Apple",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
         Goods goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
         store.addGoods(goods1);
         store.addGoods(goods2);
@@ -80,6 +81,9 @@ public class Main {
         Receipt receipt3 = store.checkoutClient(checkout3, cart3);
         dbManager.addReceipt(receipt3);
         dbManager.addItemToShoppingCart(cart3, receipt3);
+        
+        dbManager.addGoods(goods1);
+        dbManager.addGoods(goods2);
         
         // Viewing financial information
         System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());

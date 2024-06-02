@@ -3,12 +3,11 @@
 Serial Number: 1
 Issued by: Anna Smith
 -------------------------
-Date: 2024-05-30
-Time: 11:25:09
+Date: 2024-06-02
+Time: 11:40:54
 -------------------------
--20 Apple pie       
-with strawberry  $1.56
--10 Milk             $2.00
+-20 Apple           $1.56
+-10 Milk            $2.00
 =========================
  TOTAL:          $61.40
 Cash:            $200.55

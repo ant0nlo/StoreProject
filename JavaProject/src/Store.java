@@ -105,12 +105,8 @@ public class Store {
 		this.totalTurnover = totalTurnover;
 	}
 	
-	public static void setMarkup(Category category, double value) {
+	public void setMarkup(Category category, double value) {
         category.setValue(value);
-    }
-	
-	public static double getMarkup(Category category) {
-        return category.getValue();
     }
 	
     public void setExpirationDateInStore(Goods good, LocalDate expirationDate) {
@@ -121,5 +117,4 @@ public class Store {
     	good.setDiscountPercentage(discountPercentage);
     }
     
-
 }

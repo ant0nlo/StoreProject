@@ -45,7 +45,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testAddGoods() {
-        Goods goods = new Goods(1, "Apple Juice", new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods = new Goods(1, "Apple Juice", new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 10000);
         dbManager.addGoods(goods);
 
         try (Connection conn = dbManager.connect();
@@ -94,14 +94,14 @@ public class DatabaseManagerTest {
         Cashier cashier = new Cashier(1, "Jane Smith", 1500);
         dbManager.addCashier(cashier);
 
-        Goods goods = new Goods(1, "Apple",new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods = new Goods(1, "Apple",new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 10000);
         dbManager.addGoods(goods);
 
         Store store = new Store();
         store.addCashier(cashier);
         store.addGoods(goods);
 
-        Store.setMarkup(Category.EATABLE, 20); 
+        store.setMarkup(Category.EATABLE, 20); 
         Map<Goods, Integer> items = new HashMap<>();
         ShoppingCart shoppingCart = new ShoppingCart(items, new BigDecimal("200.00"));
         shoppingCart.addItem(goods, 5);
@@ -131,7 +131,7 @@ public class DatabaseManagerTest {
         Cashier cashier = new Cashier(1, "Jane Smith", 1500);
         dbManager.addCashier(cashier);
 
-        Goods goods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
+        Goods goods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 10000);
         dbManager.addGoods(goods);
 
         Store store = new Store();

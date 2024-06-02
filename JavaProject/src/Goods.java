@@ -15,16 +15,16 @@ public class Goods {
     private int quantityAvailable;
 
     public Goods(int id, String name, BigDecimal unitDeliveryPrice, Category category, LocalDate expirationDate,
-    		double discountPercentage, int totalAvailable) {
+    		double discountPercentage, int totalDelivered) {
         this.id = id;
         this.name = name;
         this.unitDeliveryPrice = unitDeliveryPrice;
         this.category = category;
         this.expirationDate = expirationDate;
         this.discountPercentage = discountPercentage;
+        this.totalDelivered = totalDelivered;
+        this.quantityAvailable = totalDelivered;
         this.markupPercentage = category.getValue();
-        this.totalDelivered = totalAvailable;
-        this.quantityAvailable = totalAvailable;
     }
     
     public int getId() {
@@ -81,7 +81,6 @@ public class Goods {
     public void setTotalDelivered(int totalAvailable) {
         this.totalDelivered = totalAvailable;
     }
-
     public Goods getGoods() {
         return this;
     }
@@ -101,7 +100,7 @@ public class Goods {
 
     // Method to calculate selling price
     public BigDecimal calculateSellingPrice() {
-        BigDecimal markupPercentage = BigDecimal.valueOf(Store.getMarkup(category));
+        BigDecimal markupPercentage = BigDecimal.valueOf(getCategory().getValue());
         BigDecimal sellingPrice = unitDeliveryPrice.multiply(
                 BigDecimal.ONE.add(markupPercentage.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP))
         );

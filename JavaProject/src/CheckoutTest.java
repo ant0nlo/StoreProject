@@ -1,5 +1,4 @@
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,7 @@ class CheckoutTest {
     public void setUp() {
         cashier = new Cashier(1, "John Doe", 1000);
         store = new Store();
-        Store.setMarkup(Category.EATABLE, 20); 
+        store.setMarkup(Category.EATABLE, 20); 
 
         goods1 = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
         goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);

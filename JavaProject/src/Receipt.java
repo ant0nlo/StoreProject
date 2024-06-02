@@ -71,9 +71,10 @@ public class Receipt {
 
     // Method to generate receipt content
     public String generateReceiptContent() {
+    	int numOfChars = 25;
         StringBuilder receiptContent = new StringBuilder();
         receiptContent.append("         RECEIPT").append("\n");
-        receiptContent.append(String.valueOf("=").repeat(25) + "\n");
+        receiptContent.append(String.valueOf("=").repeat(numOfChars) + "\n");
         receiptContent.append("Serial Number: ").append(serialNumber).append("\n");
         if (issuingCashier.getName().length() < 14) {
         	receiptContent.append("Issued by: ").append(issuingCashier.getName()).append("\n");
@@ -81,12 +82,13 @@ public class Receipt {
         	receiptContent.append("Issued by: ").append("\n");
         	receiptContent.append(" " + issuingCashier.getName()).append("\n");
         }
-        receiptContent.append(String.valueOf("-").repeat(25)).append("\n");
+        receiptContent.append(String.valueOf("-").repeat(numOfChars)).append("\n");
         receiptContent.append("Date: ").append(issuanceDateTime.toString().substring(0, 10)).append("\n");
         receiptContent.append("Time: ").append(issuanceDateTime.toString().substring(11, 19)).append("\n");
-        receiptContent.append(String.valueOf("-").repeat(25)).append("\n");
+        receiptContent.append(String.valueOf("-").repeat(numOfChars)).append("\n");
         
         Map<Goods, Integer> items = shoppingCart.getItems();
+        
         for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
             Goods goods = entry.getKey();
             int quantity = entry.getValue();
@@ -94,7 +96,7 @@ public class Receipt {
             String[] nameParts = splitName(goods.getName());
             receiptContent.append("-").append(quantity).append(" ");
             for (String part : nameParts) {
-            	receiptContent.append(part).append(numberOfSpaces(part)).append(" ");
+            	receiptContent.append(part).append(numberOfSpaces(part));
                 if (part.equals(nameParts[nameParts.length - 1])) {
                     receiptContent.append(" $").append(goods.getUnitDeliveryPrice());
                 }
@@ -102,7 +104,7 @@ public class Receipt {
             }
             
         }
-        receiptContent.append(String.valueOf("=").repeat(25));
+        receiptContent.append(String.valueOf("=").repeat(numOfChars));
         
         receiptContent.append("\n TOTAL:")
         			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))

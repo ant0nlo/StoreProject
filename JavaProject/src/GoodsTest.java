@@ -10,13 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GoodsTest {
 
     private Goods goods;
+    private Store store;
 
 
     @BeforeEach
     public void setUp() {
-        Store.setMarkup(Category.EATABLE, 20); 
+    	store = new Store();
+        store.setMarkup(Category.EATABLE, 20); 
 
-        goods = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        goods = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 100);
 
     }
 
@@ -33,7 +35,7 @@ public class GoodsTest {
 
     @Test
     public void testCalculateSellingPrice() {
-        Store.setMarkup(Category.EATABLE, 20); 
+        store.setMarkup(Category.EATABLE, 20); 
 
         BigDecimal expectedSellingPrice = BigDecimal.valueOf(1.0).multiply(BigDecimal.ONE.add(BigDecimal.valueOf(20).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)));
         assertEquals(0, expectedSellingPrice.compareTo(goods.calculateSellingPrice()), 
@@ -42,9 +44,9 @@ public class GoodsTest {
 
     @Test
     public void testEquals() {
-        Goods sameGoods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-        Goods differentGoods = new Goods(2, "Orange", new BigDecimal("1.50"), Category.EATABLE, LocalDate.now().plusDays(3), 5, 100);
-        Goods sameIdDifferentName = new Goods(1, "Orange", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        Goods sameGoods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 100);
+        Goods differentGoods = new Goods(2, "Orange", new BigDecimal("1.50"), Category.EATABLE, LocalDate.now().plusDays(3) , 5, 100);
+        Goods sameIdDifferentName = new Goods(1, "Orange", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 100);
 
         assertTrue(goods.equals(sameGoods), "Goods should be equal to another goods with the same ID");
         assertFalse(goods.equals(differentGoods), "Goods should not be equal to another goods with a different ID");

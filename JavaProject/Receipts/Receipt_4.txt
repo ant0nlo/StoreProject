@@ -3,12 +3,11 @@
 Serial Number: 4
 Issued by: John Doe
 -------------------------
-Date: 2024-05-30
-Time: 11:25:10
+Date: 2024-06-02
+Time: 11:40:54
 -------------------------
--30 Apple pie       
-with strawberry  $1.56
--20 Milk             $2.00
+-30 Apple           $1.56
+-20 Milk            $2.00
 =========================
  TOTAL:          $104.10
 Cash:            $500.50
