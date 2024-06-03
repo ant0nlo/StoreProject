@@ -20,7 +20,7 @@ class CheckoutTest {
 
     @BeforeEach
     public void setUp() {
-        cashier = new Cashier(1, "John Doe", 1000);
+        cashier = new Cashier(1, "John Doe", new BigDecimal("1000.00"));
         store = new Store();
         store.setMarkup(Category.EATABLE, 20); 
 

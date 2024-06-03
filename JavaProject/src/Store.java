@@ -42,7 +42,7 @@ public class Store {
     public BigDecimal calculateTotalCashierSalaries() {
     	 BigDecimal totalSalaries = BigDecimal.ZERO;
          for (Cashier cashier : cashiers) {
-             totalSalaries = totalSalaries.add(BigDecimal.valueOf(cashier.getMonthlySalary()).multiply(BigDecimal.valueOf(12)));
+             totalSalaries = totalSalaries.add(cashier.getMonthlySalary().multiply(BigDecimal.valueOf(12)));
          }
          return totalSalaries;
     }

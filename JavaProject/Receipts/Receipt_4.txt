@@ -1,10 +1,10 @@
          RECEIPT
 =========================
 Serial Number: 4
-Issued by: John Doe
+Issued by: Anna Smith
 -------------------------
-Date: 2024-06-02
-Time: 11:40:54
+Date: 2024-06-03
+Time: 11:59:12
 -------------------------
 -30 Apple           $1.56
 -20 Milk            $2.00

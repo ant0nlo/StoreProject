@@ -1,12 +1,13 @@
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Cashier {
-	private String name;
+    private String name;
     private int id;
-    private double monthlySalary;
+    private BigDecimal monthlySalary;
 
-    public Cashier(int id, String name, double monthlySalary) {
-    	this.id = id;
+    public Cashier(int id, String name, BigDecimal monthlySalary) {
+        this.id = id;
         this.name = name;
         this.monthlySalary = monthlySalary;
     }
@@ -27,33 +28,33 @@ public class Cashier {
         this.id = id;
     }
 
-    public double getMonthlySalary() {
+    public BigDecimal getMonthlySalary() {
         return monthlySalary;
     }
 
-    public void setMonthlySalary(double monthlySalary) {
+    public void setMonthlySalary(BigDecimal monthlySalary) {
         this.monthlySalary = monthlySalary;
     }
 
-    public double calculateAnnualSalary() {
-        return monthlySalary * 12;
+    public BigDecimal calculateAnnualSalary() {
+        return monthlySalary.multiply(BigDecimal.valueOf(12));
     }
 
     @Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if ((obj == null) || (getClass() != obj.getClass()))
-			return false;
-		Cashier other = (Cashier) obj;
-		return id == other.id;
-	}
-	
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if ((obj == null) || (getClass() != obj.getClass()))
+            return false;
+        Cashier other = (Cashier) obj;
+        return id == other.id;
+    }
+
     @Override
     public String toString() {
         return "Cashier{" +
@@ -62,5 +63,4 @@ public class Cashier {
                 ", monthlySalary=" + monthlySalary +
                 '}';
     }
-
 }

@@ -128,13 +128,13 @@ public class DatabaseManager {
             
             if (rs.next()) {
                 pstmtUpdate.setString(1, cashier.getName());
-                pstmtUpdate.setDouble(2, cashier.getMonthlySalary());
+                pstmtUpdate.setBigDecimal(2, cashier.getMonthlySalary());
                 pstmtUpdate.setInt(3, cashier.getId());
                 pstmtUpdate.executeUpdate();
             } else {
                 pstmtInsert.setInt(1, cashier.getId());
                 pstmtInsert.setString(2, cashier.getName());
-                pstmtInsert.setDouble(3, cashier.getMonthlySalary());
+                pstmtInsert.setBigDecimal(3, cashier.getMonthlySalary());
                 pstmtInsert.executeUpdate();
             }
         } catch (SQLException e) {

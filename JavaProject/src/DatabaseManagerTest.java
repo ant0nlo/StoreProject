@@ -70,7 +70,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testAddCashier() {
-        Cashier cashier = new Cashier(1, "John Doe", 1000);
+        Cashier cashier = new Cashier(1, "John Doe", new BigDecimal("1000.00"));
         dbManager.addCashier(cashier);
 
         try (Connection conn = dbManager.connect();
@@ -91,7 +91,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testAddReceipt() {
-        Cashier cashier = new Cashier(1, "Jane Smith", 1500);
+        Cashier cashier = new Cashier(1, "Jane Smith", new BigDecimal("1500.00"));
         dbManager.addCashier(cashier);
 
         Goods goods = new Goods(1, "Apple",new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 10000);
@@ -128,7 +128,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testAddItemToShoppingCart() {
-        Cashier cashier = new Cashier(1, "Jane Smith", 1500);
+        Cashier cashier = new Cashier(1, "Jane Smith", new BigDecimal("1500.00"));
         dbManager.addCashier(cashier);
 
         Goods goods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 10000);
