@@ -1,13 +1,13 @@
          RECEIPT
 =========================
 Serial Number: 3
-Issued by: John Doe
+Issued by: Georgi Petrov
 -------------------------
-Date: 2024-06-03
-Time: 11:59:12
+Date: 2024-06-04
+Time: 18:40:52
 -------------------------
 -15 Apple           $1.56
--8 Milk            $2.00
+-8 Bread           $2.00
 =========================
  TOTAL:          $47.25
 Cash:            $300.75

@@ -1,711 +1,167 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
-public class Cashier {
-	private String name;
-    private int id;
-    private double monthlySalary;
+public class Receipt {
+    private static int serialNumberCounter = 1;
+    private int serialNumber;
+    private Cashier issuingCashier;
+    private LocalDateTime issuanceDateTime;
+    private ShoppingCart shoppingCart;
+    private BigDecimal totalAmountPaid;
 
-    public Cashier(int id, String name, double monthlySalary) {
-    	this.id = id;
-        this.name = name;
-        this.monthlySalary = monthlySalary;
+    public Receipt(Cashier issuingCashier, ShoppingCart shoppingCart) {
+        this.serialNumber = serialNumberCounter++;
+        this.issuingCashier = issuingCashier;
+        this.issuanceDateTime = LocalDateTime.now();
+        this.shoppingCart = shoppingCart;
+        this.totalAmountPaid = shoppingCart.calculateTotalAmountToPay();
     }
 
-    public String getName() {
-        return name;
+    public int getSerialNumber() {
+        return serialNumber;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Cashier getIssuingCashier() {
+        return issuingCashier;
     }
 
-    public int getId() {
-        return id;
+    public LocalDateTime getIssuanceDateTime() {
+        return issuanceDateTime;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public BigDecimal getTotalAmountPaid() {
+        return totalAmountPaid;
+    }
+    
+    public void setSerialNumber(int serialNumber) {
+        this.serialNumber = serialNumber;
     }
 
-    public double getMonthlySalary() {
-        return monthlySalary;
+    public void setIssuingCashier(Cashier issuingCashier) {
+        this.issuingCashier = issuingCashier;
     }
 
-    public void setMonthlySalary(double monthlySalary) {
-        this.monthlySalary = monthlySalary;
+    public void setIssuanceDateTime(LocalDateTime issuanceDateTime) {
+        this.issuanceDateTime = issuanceDateTime;
     }
 
-    public double calculateAnnualSalary() {
-        return monthlySalary * 12;
+    public void setTotalAmountPaid(BigDecimal totalAmountPaid) {
+        this.totalAmountPaid = totalAmountPaid;
     }
 
-    @Override
+    // Method to generate receipt content
+    public String generateReceiptContent() {
+    	int numOfChars = 25;
+        StringBuilder receiptContent = new StringBuilder();
+        receiptContent.append("         RECEIPT").append("\n");
+        receiptContent.append(String.valueOf("=").repeat(numOfChars) + "\n");
+        receiptContent.append("Serial Number: ").append(serialNumber).append("\n");
+        if (issuingCashier.getName().length() < 14) {
+        	receiptContent.append("Issued by: ").append(issuingCashier.getName()).append("\n");
+        } else {
+        	receiptContent.append("Issued by: ").append("\n");
+        	receiptContent.append(" " + issuingCashier.getName()).append("\n");
+        }
+        receiptContent.append(String.valueOf("-").repeat(numOfChars)).append("\n");
+        receiptContent.append("Date: ").append(issuanceDateTime.toString().substring(0, 10)).append("\n");
+        receiptContent.append("Time: ").append(issuanceDateTime.toString().substring(11, 19)).append("\n");
+        receiptContent.append(String.valueOf("-").repeat(numOfChars)).append("\n");
+        
+        Map<Goods, Integer> items = shoppingCart.getItems();
+        
+        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
+            Goods goods = entry.getKey();
+            int quantity = entry.getValue();
+            
+            String[] nameParts = splitName(goods.getName());
+            receiptContent.append("-").append(quantity).append(" ");
+            for (String part : nameParts) {
+            	receiptContent.append(part).append(numberOfSpaces(part));
+                if (part.equals(nameParts[nameParts.length - 1])) {
+                    receiptContent.append(" $").append(goods.getUnitDeliveryPrice());
+                }
+                receiptContent.append("\n");
+            }
+            
+        }
+        receiptContent.append(String.valueOf("=").repeat(numOfChars));
+        
+        receiptContent.append("\n TOTAL:")
+        			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
+        			  .append(" $").append(totalAmountPaid)
+        			  .append("\n");
+        receiptContent.append("Cash:")
+        			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
+        			  .append("   $").append(shoppingCart.getCustomerMoney())
+        			  .append("\n");
+        receiptContent.append("Change:")
+        			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
+        			  .append(" $").append(shoppingCart.getCustomerMoney().subtract(totalAmountPaid) )
+        			  .append("\n");
+        
+        return receiptContent.toString();
+    }
+
+    private String[] splitName(String name) {
+        if (name.length() <= 15) {
+            return new String[] {name};
+        }
+
+        int middleIndex = name.length() / 2;
+        int splitIndex = middleIndex;
+        // Търсим интервал най-близо до средата, но не след средата
+        while (splitIndex > 0 && name.charAt(splitIndex) != ' ') {
+            splitIndex--;
+        }
+        // Ако няма интервал, който да разделя текста преди средата, използваме средата
+        if (splitIndex == 0) {
+            splitIndex = middleIndex;
+        }
+        String firstPart = name.substring(0, splitIndex).trim();
+        String secondPart = name.substring(splitIndex).trim();
+        return new String[] {firstPart, secondPart};
+    }
+
+    // Method for the spaces
+    public String numberOfSpaces(Object getNameResult) {
+    	String valueAsString = String.valueOf(getNameResult);
+        int spacesNeeded = 15 - valueAsString.length();
+        StringBuilder spaces = new StringBuilder();
+        for (int i = 0; i < spacesNeeded; i++) {
+            spaces.append(" ");
+        }
+        return spaces.toString();
+    }
+    
+    // Method to save receipt to a file
+    public void saveReceiptToFile() {
+        String filename = "Receipts/Receipt_" + serialNumber + ".txt";
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.write(generateReceiptContent());
+        } catch (IOException e) {
+            System.err.println("Error occurred while saving receipt to file: " + e.getMessage());
+        }
+    }
+
+	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(serialNumber);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if ((obj == null) || (getClass() != obj.getClass()))
-			return false;
-		Cashier other = (Cashier) obj;
-		return id == other.id;
-	}
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Receipt receipt = (Receipt) o;
+        return serialNumber == receipt.serialNumber;
+    }
 	
-    @Override
-    public String toString() {
-        return "Cashier{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                ", monthlySalary=" + monthlySalary +
-                '}';
-    }
-
-}
-
-public enum Category {
-	EATABLE(0.0),
-    NON_EDIBLE(0.0);
-
-    private double value;
-
-    Category(double value) {
-        this.value = value;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-    }
-
-    public double getValue() {
-        return value;
-    }
-    public Category getName() {
-        return this;
-    }
-}
-
-import java.math.BigDecimal;
-import java.util.Map;
-
-public class Checkout  {
-    private Cashier cashier;
-
-    public Checkout(Cashier cashier) {
-        this.cashier = cashier;
-    }
-
-    public Receipt sellGoods(ShoppingCart shoppingCart) {
-        Receipt receipt = new Receipt(cashier, shoppingCart);
-        Map<Goods, Integer> items = shoppingCart.getItems();
-        
-        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
-            Goods goods = entry.getKey();
-            int quantity = entry.getValue();
-            
-            if (goods.getQuantityAvailable() < quantity) {
-                throw new IllegalArgumentException("Not enough quantity available for sale: " + goods.getName());
-            }
-            if (goods.isExpired()) {
-                throw new IllegalArgumentException("The item " + goods.getName() + " has expired and cannot be sold.");
-            }
-            goods.decreaseQuantity(quantity);
-        }
-        
-        receipt.saveReceiptToFile();
-        return receipt;
-
-    }
-
-    public Receipt markGoods(ShoppingCart shoppingCart) {
-        BigDecimal totalAmountToPay = BigDecimal.ZERO;
-        Map<Goods, Integer> items = shoppingCart.getItems();
-
-        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
-            Goods goods = entry.getKey();
-            int quantity = entry.getValue();
-            totalAmountToPay = totalAmountToPay.add(goods.calculateSellingPrice().multiply(BigDecimal.valueOf(quantity)));
-        }
-
-        if (shoppingCart.getCustomerMoney().compareTo(totalAmountToPay) < 0) {
-            throw new IllegalArgumentException("Not enough money to buy these goods.");
-        }
-
-        return sellGoods(shoppingCart);
-    }
-
-}
-
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
-class CheckoutTest {
-
-    private Cashier cashier;
-    private Store store;
-    private Checkout checkout;
-    private ShoppingCart shoppingCart;
-    private Goods goods1;
-    private Goods goods2;
-
-    @BeforeEach
-    public void setUp() {
-        cashier = new Cashier(1, "John Doe", 1000);
-        store = new Store();
-        Store.setMarkup(Category.EATABLE, 20); 
-
-        goods1 = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-        goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-        store.addGoods(goods1);
-        store.addGoods(goods2);
-        
-        Map<Goods, Integer> items = new HashMap<>();
-        shoppingCart = new ShoppingCart(items, new BigDecimal("100.00"));
-        shoppingCart.addItem(goods1, 2);
-        shoppingCart.addItem(goods2, 3);
-        checkout = new Checkout(cashier);
-    }
-
-    @Test
-    public void testSellGoodsSuccess() {
-    	Receipt receipt = store.checkoutClient(checkout, shoppingCart);
-
-        assertEquals(98, goods1.getQuantityAvailable());
-        assertEquals(97, goods2.getQuantityAvailable());
-        assertEquals(new BigDecimal("9.60"), receipt.getTotalAmountPaid());
-        assertEquals(1, store.getReceipts().size());
-
-    }
-    
-    @Test
-    public void testSellGoodsNotEnoughQuantity() {
-        goods1.setQuantityAvailable(1); // Not enough quantity
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-        	store.checkoutClient(checkout, shoppingCart);
-        });
-        assertEquals("Not enough quantity available for sale: Apple", thrown.getMessage());
-    }
-
-    @Test
-    public void testSellGoodsItemExpired() {
-        store.setExpirationDateInStore(goods1, LocalDate.now().minusDays(1)); // Item expired
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-        	store.checkoutClient(checkout, shoppingCart);
-        });
-        assertEquals("The item Apple has expired and cannot be sold.", thrown.getMessage());
-    }
-
-    
-
-    @Test
-    public void testSellGoodsNotEnoughMoney() {
-        shoppingCart.setCustomerMoney(new BigDecimal("5.00")); // Not enough money
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            checkout.markGoods(shoppingCart);
-            
-        });
-        assertEquals("Not enough money to buy these goods.", thrown.getMessage());
-    }
-}
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-public class CreateDatabase {
-    public static void main(String[] args) {
-        Connection connection = null;
-        try {
-            // Register SQLite JDBC driver
-            Class.forName("org.sqlite.JDBC");
-            
-            // Connect to the database
-            connection = DriverManager.getConnection("jdbc:sqlite:mydatabase.db");
-
-            
-            // Create table
-            Statement statement = connection.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS MyTable (id INTEGER PRIMARY KEY, name TEXT)";
-            statement.executeUpdate(sql);
-            System.out.println("Table created successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
-import java.sql.*;
-import java.util.Map;
-
-public class DatabaseManager {
-	 String URL = "jdbc:mysql://localhost:3306/mydb";
-	 String username = "root";
-	 String password = "5842";
-
-	    public Connection connect() throws SQLException {
-	        try {
-	            Class.forName("com.mysql.cj.jdbc.Driver");
-	        } catch (ClassNotFoundException e) {
-	            System.out.println("MySQL JDBC driver not found.");
-	            e.printStackTrace();
-	        }
-	        return DriverManager.getConnection(URL, username, password);
-	    }
-    
-    public void createTables() {
-        String createGoodsTable = """
-            CREATE TABLE IF NOT EXISTS Goods (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                unitDeliveryPrice REAL NOT NULL,
-                category TEXT NOT NULL,
-                expirationDate TEXT,
-                markupPercentage REAL NOT NULL,
-                discountPercentage REAL NOT NULL,
-                totalAvailable INTEGER NOT NULL,
-                quantityAvailable INTEGER NOT NULL
-            );
-        """;
-
-        String createCashiersTable = """
-            CREATE TABLE IF NOT EXISTS Cashiers (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                monthlySalary REAL NOT NULL
-            );
-        """;
-        
-        String createReceiptsTable = """
-            CREATE TABLE IF NOT EXISTS Receipts (
-                serialNumber INTEGER PRIMARY KEY AUTO_INCREMENT,
-                cashierId INTEGER,
-                issuanceDateTime TEXT NOT NULL,
-                totalAmountPaid REAL NOT NULL,
-                FOREIGN KEY(cashierId) REFERENCES Cashiers(id)
-            );
-        """;
-
-        String createShoppingCartItemsTable = """
-            CREATE TABLE IF NOT EXISTS ShoppingCartItems (
-                receiptSerialNumber INTEGER,
-                goodsId INTEGER,
-                quantity INTEGER NOT NULL,
-                FOREIGN KEY(receiptSerialNumber) REFERENCES Receipts(serialNumber),
-                FOREIGN KEY(goodsId) REFERENCES Goods(id)
-            );
-        """;
-
-        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
-            stmt.execute(createGoodsTable);
-            stmt.execute(createCashiersTable);
-            stmt.execute(createReceiptsTable);
-            stmt.execute(createShoppingCartItemsTable);
-        } catch (SQLException e) {
-            System.out.println("Error creating tables: " + e.getMessage());
-        }
-    }
-    
-    public void addGoods(Goods goods) {
-        String sqlSelect = "SELECT id FROM Goods WHERE id = ?";
-        String sqlInsert = "INSERT INTO Goods(id, name, unitDeliveryPrice, category, expirationDate, markupPercentage, discountPercentage, totalAvailable, quantityAvailable) VALUES(?,?,?,?,?,?,?,?,?)";
-        String sqlUpdate = "UPDATE Goods SET name = ?, unitDeliveryPrice = ?, category = ?, expirationDate = ?, markupPercentage = ?, discountPercentage = ?, totalAvailable = ?, quantityAvailable = ? WHERE id = ?";
-
-        try (Connection conn = connect(); 
-             PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
-             PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
-             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
-            
-            pstmtSelect.setInt(1, goods.getId());
-            ResultSet rs = pstmtSelect.executeQuery();
-            
-            if (rs.next()) {
-                // If the goods exist, update it
-                pstmtUpdate.setString(1, goods.getName());
-                pstmtUpdate.setBigDecimal(2, goods.getUnitDeliveryPrice());
-                pstmtUpdate.setString(3, goods.getCategory().toString());
-                pstmtUpdate.setString(4, goods.getExpirationDate() != null ? goods.getExpirationDate().toString() : null);
-                pstmtUpdate.setDouble(5, goods.getMarkupPercentage());
-                pstmtUpdate.setDouble(6, goods.getDiscountPercentage());
-                pstmtUpdate.setInt(7, goods.getTotalDelivered());
-                pstmtUpdate.setInt(8, goods.getQuantityAvailable());
-                pstmtUpdate.setInt(9, goods.getId());
-                pstmtUpdate.executeUpdate();
-            } else {
-                // If the goods do not exist, insert it
-                pstmtInsert.setInt(1, goods.getId());
-                pstmtInsert.setString(2, goods.getName());
-                pstmtInsert.setBigDecimal(3, goods.getUnitDeliveryPrice());
-                pstmtInsert.setString(4, goods.getCategory().toString());
-                pstmtInsert.setString(5, goods.getExpirationDate() != null ? goods.getExpirationDate().toString() : null);
-                pstmtInsert.setDouble(6, goods.getMarkupPercentage());
-                pstmtInsert.setDouble(7, goods.getDiscountPercentage());
-                pstmtInsert.setInt(8, goods.getTotalDelivered());
-                pstmtInsert.setInt(9, goods.getQuantityAvailable());
-                pstmtInsert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            System.out.println("Error adding or updating goods: " + e.getMessage());
-        }
-    }
-
-
-    public void addCashier(Cashier cashier) {
-        String sqlSelect = "SELECT id FROM Cashiers WHERE id = ?";
-        String sqlInsert = "INSERT INTO Cashiers(id, name, monthlySalary) VALUES(?,?,?)";
-        String sqlUpdate = "UPDATE Cashiers SET name = ?, monthlySalary = ? WHERE id = ?";
-
-        try (Connection conn = connect(); 
-             PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
-             PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
-             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
-            
-            pstmtSelect.setInt(1, cashier.getId());
-            ResultSet rs = pstmtSelect.executeQuery();
-            
-            if (rs.next()) {
-                pstmtUpdate.setString(1, cashier.getName());
-                pstmtUpdate.setDouble(2, cashier.getMonthlySalary());
-                pstmtUpdate.setInt(3, cashier.getId());
-                pstmtUpdate.executeUpdate();
-            } else {
-                pstmtInsert.setInt(1, cashier.getId());
-                pstmtInsert.setString(2, cashier.getName());
-                pstmtInsert.setDouble(3, cashier.getMonthlySalary());
-                pstmtInsert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            System.out.println("Error adding or updating cashier: " + e.getMessage());
-        }
-    }
-
-    public void addReceipt(Receipt receipt) {
-        String sqlSelect = "SELECT serialNumber FROM Receipts WHERE serialNumber = ?";
-        String sqlInsert = "INSERT INTO Receipts(serialNumber, cashierId, issuanceDateTime, totalAmountPaid) VALUES(?,?,?,?)";
-        String sqlUpdate = "UPDATE Receipts SET cashierId = ?, issuanceDateTime = ?, totalAmountPaid = ? WHERE serialNumber = ?";
-
-        try (Connection conn = connect(); 
-             PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
-             PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
-             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
-            
-            pstmtSelect.setInt(1, receipt.getSerialNumber());
-            ResultSet rs = pstmtSelect.executeQuery();
-            
-            if (rs.next()) {
-                // Update the existing record
-                pstmtUpdate.setInt(1, receipt.getIssuingCashier().getId());
-                pstmtUpdate.setString(2, receipt.getIssuanceDateTime().toString());
-                pstmtUpdate.setBigDecimal(3, receipt.getTotalAmountPaid());
-                pstmtUpdate.setInt(4, receipt.getSerialNumber());
-                pstmtUpdate.executeUpdate();
-            } else {
-                // Insert a new record
-                pstmtInsert.setInt(1, receipt.getSerialNumber());
-                pstmtInsert.setInt(2, receipt.getIssuingCashier().getId());
-                pstmtInsert.setString(3, receipt.getIssuanceDateTime().toString());
-                pstmtInsert.setBigDecimal(4, receipt.getTotalAmountPaid());
-                pstmtInsert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            System.out.println("Error adding or updating receipt: " + e.getMessage());
-        }
-    }
-
-
-    public void addItemToShoppingCart(ShoppingCart shoppingCart, Receipt receipt) {
-        String sqlSelect = "SELECT * FROM ShoppingCartItems WHERE receiptSerialNumber = ? AND goodsId = ?";
-        String sqlInsert = "INSERT INTO ShoppingCartItems(receiptSerialNumber, goodsId, quantity) VALUES(?,?,?)";
-        String sqlUpdate = "UPDATE ShoppingCartItems SET quantity = ? WHERE receiptSerialNumber = ? AND goodsId = ?";
-
-        Connection conn = null;
-
-        try {
-            conn = connect(); 
-            conn.setAutoCommit(false);  // Start transaction
-
-            try (PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
-                 PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
-                 PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
-
-                for (Map.Entry<Goods, Integer> entry : shoppingCart.getItems().entrySet()) {
-                    pstmtSelect.setInt(1, receipt.getSerialNumber());
-                    pstmtSelect.setInt(2, entry.getKey().getId());
-                    ResultSet rs = pstmtSelect.executeQuery();
-
-                    if (rs.next()) {
-                        pstmtUpdate.setInt(1, entry.getValue());
-                        pstmtUpdate.setInt(2, receipt.getSerialNumber());
-                        pstmtUpdate.setInt(3, entry.getKey().getId());
-                        pstmtUpdate.addBatch();
-                    } else {
-                        pstmtInsert.setInt(1, receipt.getSerialNumber());
-                        pstmtInsert.setInt(2, entry.getKey().getId());
-                        pstmtInsert.setInt(3, entry.getValue());
-                        pstmtInsert.addBatch();
-                    }
-                }
-
-                pstmtInsert.executeBatch();
-                pstmtUpdate.executeBatch();
-                conn.commit();  // Commit transaction
-
-            } catch (SQLException e) {
-                System.out.println("Error adding or updating items to shopping cart: " + e.getMessage());
-                if (conn != null) {
-                    try {
-                        conn.rollback();  // Rollback transaction on error
-                    } catch (SQLException rollbackException) {
-                        System.out.println("Error during rollback: " + rollbackException.getMessage());
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Connection error: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException e) {
-                    System.out.println("Error closing connection: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    
-    public void deleteAllGoods() {
-        String sql = "DELETE FROM Goods";
-
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.executeUpdate();
-            System.out.println("All goods have been deleted.");
-        } catch (SQLException e) {
-            System.out.println("Error deleting goods: " + e.getMessage());
-        }
-    }
-
-    public void deleteAllCashiers() {
-        String sql = "DELETE FROM Cashiers";
-
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.executeUpdate();
-            System.out.println("All cashiers have been deleted.");
-        } catch (SQLException e) {
-            System.out.println("Error deleting cashiers: " + e.getMessage());
-        }
-    }
-
-    public void deleteAllReceipts() {
-        String sql = "DELETE FROM Receipts";
-
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.executeUpdate();
-            System.out.println("All receipts have been deleted.");
-        } catch (SQLException e) {
-            System.out.println("Error deleting receipts: " + e.getMessage());
-        }
-    }
-
-    public void deleteAllShoppingCartItems() {
-        String sql = "DELETE FROM ShoppingCartItems";
-
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.executeUpdate();
-            System.out.println("All shopping cart items have been deleted.");
-        } catch (SQLException e) {
-            System.out.println("Error deleting shopping cart items: " + e.getMessage());
-        }
-    }
-
-
-}
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.sql.*;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
-public class DatabaseManagerTest {
-
-    private DatabaseManager dbManager;
-
-    @BeforeEach
-    public void setUp() {
-    	
-        dbManager = new DatabaseManager();
-        dbManager.createTables();
-    }
-
-    @Test
-    public void testCreateTables() {
-        try (Connection conn = dbManager.connect()) {
-            DatabaseMetaData metaData = conn.getMetaData();
-
-            ResultSet rs = metaData.getTables(null, null, "Goods", null);
-            assertTrue(rs.next(), "Table 'Goods' should exist");
-
-            rs = metaData.getTables(null, null, "Cashiers", null);
-            assertTrue(rs.next(), "Table 'Cashiers' should exist");
-
-            rs = metaData.getTables(null, null, "Receipts", null);
-            assertTrue(rs.next(), "Table 'Receipts' should exist");
-
-            rs = metaData.getTables(null, null, "ShoppingCartItems", null);
-            assertTrue(rs.next(), "Table 'ShoppingCartItems' should exist");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            fail("Exception thrown during table creation: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testAddGoods() {
-        Goods goods = new Goods(1, "Apple Juice", new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
-        dbManager.addGoods(goods);
-
-        try (Connection conn = dbManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM Goods WHERE id = ?")) {
-
-            pstmt.setInt(1, 1);
-            ResultSet rs = pstmt.executeQuery();
-
-            assertTrue(rs.next(), "Goods with id 1 should exist");
-            assertEquals("Apple Juice", rs.getString("name"), "Name should match");
-            assertEquals(1.56, rs.getDouble("unitDeliveryPrice"), 0.01, "Unit delivery price should match");
-            assertEquals("EATABLE", rs.getString("category"), "Category should match");
-            assertEquals(LocalDate.now().plusDays(5).toString(), rs.getString("expirationDate"), "Expiration date should match");
-            assertEquals(10000, rs.getInt("totalAvailable"), "Total available should match");
-            assertEquals(10000, rs.getInt("quantityAvailable"), "Quantity available should match");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            fail("Exception thrown during goods insertion: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testAddCashier() {
-        Cashier cashier = new Cashier(1, "John Doe", 1000);
-        dbManager.addCashier(cashier);
-
-        try (Connection conn = dbManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM Cashiers WHERE id = ?")) {
-
-            pstmt.setInt(1, 1);
-            ResultSet rs = pstmt.executeQuery();
-
-            assertTrue(rs.next(), "Cashier with id 1 should exist");
-            assertEquals("John Doe", rs.getString("name"), "Name should match");
-            assertEquals(1000, rs.getDouble("monthlySalary"), 0.01, "Monthly salary should match");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            fail("Exception thrown during cashier insertion: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testAddReceipt() {
-        Cashier cashier = new Cashier(1, "Jane Smith", 1500);
-        dbManager.addCashier(cashier);
-
-        Goods goods = new Goods(1, "Apple",new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
-        dbManager.addGoods(goods);
-
-        Store store = new Store();
-        store.addCashier(cashier);
-        store.addGoods(goods);
-
-        Store.setMarkup(Category.EATABLE, 20); 
-        Map<Goods, Integer> items = new HashMap<>();
-        ShoppingCart shoppingCart = new ShoppingCart(items, new BigDecimal("200.00"));
-        shoppingCart.addItem(goods, 5);
-        Checkout checkout = new Checkout(cashier);
-        Receipt receipt = checkout.markGoods(shoppingCart);
-
-        dbManager.addReceipt(receipt);
-
-        try (Connection conn = dbManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM Receipts WHERE serialNumber = ?")) {
-
-            pstmt.setInt(1, receipt.getSerialNumber());
-            ResultSet rs = pstmt.executeQuery();
-
-            assertTrue(rs.next(), "Receipt with serialNumber 1 should exist");
-            assertEquals(1, rs.getInt("cashierId"), "Cashier ID should match");
-            assertEquals(6.0, rs.getDouble("totalAmountPaid"), 0.01, "Total amount paid should match");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            fail("Exception thrown during receipt insertion: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testAddItemToShoppingCart() {
-        Cashier cashier = new Cashier(1, "Jane Smith", 1500);
-        dbManager.addCashier(cashier);
-
-        Goods goods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 10000);
-        dbManager.addGoods(goods);
-
-        Store store = new Store();
-        store.addCashier(cashier);
-        store.addGoods(goods);
-
-        Map<Goods, Integer> items = new HashMap<>();
-        ShoppingCart shoppingCart = new ShoppingCart(items, new BigDecimal("200.00"));
-        shoppingCart.addItem(goods, 5);
-
-        Checkout checkout = new Checkout(cashier);
-        Receipt receipt = checkout.markGoods(shoppingCart);
-
-        dbManager.addReceipt(receipt);
-        dbManager.addItemToShoppingCart(shoppingCart, receipt);
-
-        try (Connection conn = dbManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM ShoppingCartItems WHERE receiptSerialNumber = ? AND goodsId = ?")) {
-
-            pstmt.setInt(1, receipt.getSerialNumber());
-            pstmt.setInt(2, goods.getId());
-            ResultSet rs = pstmt.executeQuery();
-
-            assertTrue(rs.next(), "Item with receiptSerialNumber 1 and goodsId 1 should exist in shopping cart");
-            assertEquals(5, rs.getInt("quantity"), "Quantity should match");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            fail("Exception thrown during shopping cart item insertion: " + e.getMessage());
-        }
-    }
-}
-import java.math.BigDecimal;
+}import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -722,16 +178,16 @@ public class Goods {
     private int quantityAvailable;
 
     public Goods(int id, String name, BigDecimal unitDeliveryPrice, Category category, LocalDate expirationDate,
-    		double discountPercentage, int totalAvailable) {
+    		double discountPercentage, int totalDelivered) {
         this.id = id;
         this.name = name;
         this.unitDeliveryPrice = unitDeliveryPrice;
         this.category = category;
         this.expirationDate = expirationDate;
         this.discountPercentage = discountPercentage;
+        this.totalDelivered = totalDelivered;
+        this.quantityAvailable = totalDelivered;
         this.markupPercentage = category.getValue();
-        this.totalDelivered = totalAvailable;
-        this.quantityAvailable = totalAvailable;
     }
     
     public int getId() {
@@ -788,7 +244,6 @@ public class Goods {
     public void setTotalDelivered(int totalAvailable) {
         this.totalDelivered = totalAvailable;
     }
-
     public Goods getGoods() {
         return this;
     }
@@ -808,7 +263,11 @@ public class Goods {
 
     // Method to calculate selling price
     public BigDecimal calculateSellingPrice() {
-        BigDecimal markupPercentage = BigDecimal.valueOf(Store.getMarkup(category));
+    	if (unitDeliveryPrice == null) {
+            throw new IllegalStateException("Unit delivery price is not set.");
+        }
+    	
+        BigDecimal markupPercentage = BigDecimal.valueOf(getCategory().getValue());
         BigDecimal sellingPrice = unitDeliveryPrice.multiply(
                 BigDecimal.ONE.add(markupPercentage.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP))
         );
@@ -840,7 +299,7 @@ public class Goods {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", unitDeliveryPrice=" + unitDeliveryPrice +
-                ", category='" + category + '\'' +
+                ", category='" + category.getName() + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", markupPercentage=" + markupPercentage +
                 ", discountPercentage=" + discountPercentage +
@@ -849,322 +308,96 @@ public class Goods {
     }
 }
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+public enum Category {
+	EATABLE(0.0),
+    NON_EDIBLE(0.0);
 
-import static org.junit.jupiter.api.Assertions.*;
+    private double value;
 
-public class GoodsTest {
-
-    private Goods goods;
-
-
-    @BeforeEach
-    public void setUp() {
-        Store.setMarkup(Category.EATABLE, 20); 
-
-        goods = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-
+    Category(double value) {
+        this.value = value;
     }
 
-    @Test
-    public void testIsExpired() {
-        assertFalse(goods.isExpired(), "Goods should not be expired yet");
+    public void setValue(double value) {
+        this.value = value;
     }
 
-    @Test
-    public void testDecreaseQuantity() {        
-        goods.decreaseQuantity(50);
-        assertEquals(50, goods.getQuantityAvailable(), "Decrease quantity should update quantity available");
+    public double getValue() {
+        return value;
     }
-
-    @Test
-    public void testCalculateSellingPrice() {
-        Store.setMarkup(Category.EATABLE, 20); 
-
-        BigDecimal expectedSellingPrice = BigDecimal.valueOf(1.0).multiply(BigDecimal.ONE.add(BigDecimal.valueOf(20).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)));
-        assertEquals(0, expectedSellingPrice.compareTo(goods.calculateSellingPrice()), 
-                     "Selling price calculation should be correct");
-    }
-
-    @Test
-    public void testEquals() {
-        Goods sameGoods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-        Goods differentGoods = new Goods(2, "Orange", new BigDecimal("1.50"), Category.EATABLE, LocalDate.now().plusDays(3), 5, 100);
-        Goods sameIdDifferentName = new Goods(1, "Orange", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
-
-        assertTrue(goods.equals(sameGoods), "Goods should be equal to another goods with the same ID");
-        assertFalse(goods.equals(differentGoods), "Goods should not be equal to another goods with a different ID");
-        assertTrue(goods.equals(sameIdDifferentName), "Goods should be equal to another goods with the same ID but different name");
-    }
-
-    
-}
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
-public class Main {
-    public static void main(String[] args) {
-    	
-    	DatabaseManager dbManager = new DatabaseManager();
-        try {
-			dbManager.connect();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-        //dbManager.createTables();
-        
-        // Creating store
-        Store store = new Store();
-        Store.setMarkup(Category.EATABLE, 20); 
-        Store.setMarkup(Category.NON_EDIBLE, 10); 
-
-        // Adding cashiers
-        Cashier cashier1 = new Cashier(1, "John Doe", 1000);
-        Cashier cashier2 = new Cashier(2, "Anna Smith", 1200);
-        store.addCashier(cashier1);
-        store.addCashier(cashier2);
-        
-        dbManager.addCashier(cashier1);
-        dbManager.addCashier(cashier2);
-
-        // Adding goods
-        Goods goods1 = new Goods(1, "Apple",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
-        Goods goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
-        store.addGoods(goods1);
-        store.addGoods(goods2);
-
-        dbManager.addGoods(goods1);
-        dbManager.addGoods(goods2);
-        
-        System.out.println("Total delivery costs: $" + store.calculateTotalDeliveryCosts());
-        
-        // First cart
-        Map<Goods, Integer> items = new HashMap<>();
-        ShoppingCart cart = new ShoppingCart(items,  new BigDecimal("200.55"));
-        cart.addItem(goods1, 20);
-        cart.addItem(goods2, 10);
-        Checkout checkout = new Checkout(cashier2);
-        Receipt receipt = store.checkoutClient(checkout, cart);   
-        
-        dbManager.addReceipt(receipt);
-        dbManager.addItemToShoppingCart(cart, receipt);
-               
-        // Second cart
-        Map<Goods, Integer> items1 = new HashMap<>();
-        ShoppingCart cart1 = new ShoppingCart(items1,  new BigDecimal("150.25"));
-        cart1.addItem(goods1, 10);
-        cart1.addItem(goods2, 5);
-        Checkout checkout1 = new Checkout(cashier1);
-        Receipt receipt1 = store.checkoutClient(checkout1, cart1);
-        dbManager.addReceipt(receipt1);
-        dbManager.addItemToShoppingCart(cart1, receipt1);
-        
-        // Third cart
-        Map<Goods, Integer> items2 = new HashMap<>();
-        ShoppingCart cart2 = new ShoppingCart(items2, new BigDecimal("300.75"));
-        cart2.addItem(goods1, 15);
-        cart2.addItem(goods2, 8);
-        Checkout checkout2 = new Checkout(cashier2);
-        Receipt receipt2 = store.checkoutClient(checkout2, cart2);
-        dbManager.addReceipt(receipt2);
-        dbManager.addItemToShoppingCart(cart2, receipt2);
-        
-        // Fourth cart
-        Map<Goods, Integer> items3 = new HashMap<>();
-        ShoppingCart cart3 = new ShoppingCart(items3, new BigDecimal("500.50"));
-        cart3.addItem(goods1, 30);
-        cart3.addItem(goods2, 20);
-        Checkout checkout3 = new Checkout(cashier1);
-        Receipt receipt3 = store.checkoutClient(checkout3, cart3);
-        dbManager.addReceipt(receipt3);
-        dbManager.addItemToShoppingCart(cart3, receipt3);
-
-        // Viewing financial information
-        System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());
-        System.out.println("Total revenue: $" + store.getTotalTurnover());
-        System.out.println("Total profit: $" + store.calculateTotalProfit());
-        System.out.println("Total number of receipts issued: " + store.getTotalReceiptsIssued());
+    public Category getName() {
+        return this;
     }
 }
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Objects;
 
-public class Receipt {
-    private static int serialNumberCounter = 1;
-    private int serialNumber;
-    private Cashier issuingCashier;
-    private LocalDateTime issuanceDateTime;
-    private ShoppingCart shoppingCart;
-    private BigDecimal totalAmountPaid;
+public class Cashier {
+    private String name;
+    private int id;
+    private BigDecimal monthlySalary;
 
-    public Receipt(Cashier issuingCashier, ShoppingCart shoppingCart) {
-        this.serialNumber = serialNumberCounter++;
-        this.issuingCashier = issuingCashier;
-        this.issuanceDateTime = LocalDateTime.now();
-        this.shoppingCart = shoppingCart;
-        calculateTotalAmountPaid();
+    public Cashier(int id, String name, BigDecimal monthlySalary) {
+        this.id = id;
+        this.name = name;
+        this.monthlySalary = monthlySalary;
     }
 
-    public int getSerialNumber() {
-        return serialNumber;
+    public String getName() {
+        return name;
     }
 
-    public Cashier getIssuingCashier() {
-        return issuingCashier;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public LocalDateTime getIssuanceDateTime() {
-        return issuanceDateTime;
+    public int getId() {
+        return id;
     }
 
-    public BigDecimal getTotalAmountPaid() {
-        return totalAmountPaid;
-    }
-    
-    public void setSerialNumber(int serialNumber) {
-        this.serialNumber = serialNumber;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setIssuingCashier(Cashier issuingCashier) {
-        this.issuingCashier = issuingCashier;
+    public BigDecimal getMonthlySalary() {
+        return monthlySalary;
     }
 
-    public void setIssuanceDateTime(LocalDateTime issuanceDateTime) {
-        this.issuanceDateTime = issuanceDateTime;
+    public void setMonthlySalary(BigDecimal monthlySalary) {
+        this.monthlySalary = monthlySalary;
     }
 
-    public void setTotalAmountPaid(BigDecimal totalAmountPaid) {
-        this.totalAmountPaid = totalAmountPaid;
+    public BigDecimal calculateAnnualSalary() {
+        return monthlySalary.multiply(BigDecimal.valueOf(12));
     }
 
-    // Method to calculate the total amount paid
-    private void calculateTotalAmountPaid() {
-        totalAmountPaid = BigDecimal.ZERO;
-        Map<Goods, Integer> items = shoppingCart.getItems();
-
-        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
-            Goods goods = entry.getKey();
-            int quantity = entry.getValue();
-            BigDecimal itemTotal = goods.calculateSellingPrice().multiply(BigDecimal.valueOf(quantity));
-            totalAmountPaid = totalAmountPaid.add(itemTotal);
-        }
-
-        totalAmountPaid = totalAmountPaid.setScale(2, BigDecimal.ROUND_HALF_UP);
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
-    // Method to generate receipt content
-    public String generateReceiptContent() {
-        StringBuilder receiptContent = new StringBuilder();
-        receiptContent.append("         RECEIPT").append("\n");
-        receiptContent.append(String.valueOf("=").repeat(25) + "\n");
-        receiptContent.append("Serial Number: ").append(serialNumber).append("\n");
-        if (issuingCashier.getName().length() < 14) {
-        	receiptContent.append("Issued by: ").append(issuingCashier.getName()).append("\n");
-        } else {
-        	receiptContent.append("Issued by: ").append("\n");
-        	receiptContent.append(" " + issuingCashier.getName()).append("\n");
-        }
-        receiptContent.append(String.valueOf("-").repeat(25)).append("\n");
-        receiptContent.append("Date: ").append(issuanceDateTime.toString().substring(0, 10)).append("\n");
-        receiptContent.append("Time: ").append(issuanceDateTime.toString().substring(11, 19)).append("\n");
-        receiptContent.append(String.valueOf("-").repeat(25)).append("\n");
-        
-        Map<Goods, Integer> items = shoppingCart.getItems();
-        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
-            Goods goods = entry.getKey();
-            int quantity = entry.getValue();
-            
-            if (goods.getName().length() <= 15) {
-            	receiptContent.append("-" + quantity + " ")
-            			  .append(goods.getName())
-            			  .append(numberOfSpaces(goods.getName()))
-            			  .append(" $")
-            			  .append(goods.getUnitDeliveryPrice())
-            			  .append("\n");
-            } else {
-            	
-            	String[] nameParts = splitName(goods.getName());
-            	receiptContent.append("-" + quantity + " ")
-        	    			  .append(nameParts[0]).append("\n")
-        	                  .append(nameParts[1])
-        	                  .append(numberOfSpaces(nameParts[1]))
-        	                  .append(numberOfSpaces(goods.getName()))
-                			  .append(" $")
-                			  .append(goods.getUnitDeliveryPrice())
-                			  .append("\n");
-            }
-            
-        }
-        receiptContent.append(String.valueOf("=").repeat(25));
-        
-        receiptContent.append("\n TOTAL:")
-        			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
-        			  .append(" $").append(totalAmountPaid)
-        			  .append("\n");
-        receiptContent.append("Cash:")
-        			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
-        			  .append("   $").append(shoppingCart.getCustomerMoney())
-        			  .append("\n");
-        receiptContent.append("Change:")
-        			  .append(numberOfSpaces(shoppingCart.getCustomerMoney()))
-        			  .append(" $").append(shoppingCart.getCustomerMoney().subtract(totalAmountPaid) )
-        			  .append("\n");
-        
-        return receiptContent.toString();
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if ((obj == null) || (getClass() != obj.getClass()))
+            return false;
+        Cashier other = (Cashier) obj;
+        return id == other.id;
     }
 
-    public String[] splitName(String name) {
-        // Разделяне на името на стоката на две части
-        int middleIndex = name.length() / 2;
-        String[] parts = {name.substring(0, middleIndex), name.substring(middleIndex)};
-        return parts;
+    @Override
+    public String toString() {
+        return "Cashier{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", monthlySalary=" + monthlySalary +
+                '}';
     }
-    // Method for the spaces
-    public String numberOfSpaces(Object getNameResult) {
-    	String valueAsString = String.valueOf(getNameResult);
-        int spacesNeeded = 15 - valueAsString.length();
-        StringBuilder spaces = new StringBuilder();
-        for (int i = 0; i < spacesNeeded; i++) {
-            spaces.append(" ");
-        }
-        return spaces.toString();
-    }
-    
-    // Method to save receipt to a file
-    public void saveReceiptToFile() {
-        String filename = "Receipt_" + serialNumber + ".txt";
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(generateReceiptContent());
-        } catch (IOException e) {
-            System.err.println("Error occurred while saving receipt to file: " + e.getMessage());
-        }
-    }
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(serialNumber);
-	}
-
-	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Receipt receipt = (Receipt) o;
-        return serialNumber == receipt.serialNumber;
-    }
-	
-}import java.math.BigDecimal;
+}
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -1197,7 +430,356 @@ public class ShoppingCart {
             items.put(goods, quantity);
         }
     }
+    
+    public void removeItem(Goods goods, int quantity) {
+        if (items.containsKey(goods)) {
+            int currentQuantity = items.get(goods);
+            int newQuantity = Math.max(currentQuantity - quantity, 0);
+            if (newQuantity > 0) {
+                items.put(goods, newQuantity);
+            } else {
+                items.remove(goods);
+            }
+        }
+    }
+    
+    public BigDecimal calculateTotalAmountToPay() {
+        BigDecimal totalAmountToPay = BigDecimal.ZERO;
+
+        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
+            Goods goods = entry.getKey();
+            int quantity = entry.getValue();
+
+            if (!goods.isExpired()) {
+                totalAmountToPay = totalAmountToPay.add(goods.calculateSellingPrice().multiply(BigDecimal.valueOf(quantity)));
+            }
+        }
+
+        return totalAmountToPay.setScale(2, RoundingMode.HALF_UP);
+    }
 }
+import java.math.BigDecimal;
+import java.util.Map;
+
+public class Checkout {
+    private Cashier cashier;
+
+    public Checkout(Cashier cashier) {
+        this.cashier = cashier;
+    }
+
+    public Receipt sellGoods(ShoppingCart shoppingCart) {
+    	Map<Goods, Integer> items = shoppingCart.getItems();
+    	
+        BigDecimal totalAmountToPay = shoppingCart.calculateTotalAmountToPay();
+
+        if (shoppingCart.getCustomerMoney().compareTo(totalAmountToPay) < 0) {
+            throw new IllegalArgumentException("Not enough money to buy these goods.");
+        }
+
+        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
+            Goods goods = entry.getKey();
+            int quantity = entry.getValue();
+
+            if (goods.getQuantityAvailable() < quantity) {
+                throw new IllegalArgumentException("Not enough quantity available for sale: " + goods.getName());
+            }
+            
+            if (!goods.isExpired()) {
+                goods.decreaseQuantity(quantity);
+            }
+        }
+
+        Receipt receipt = new Receipt(cashier, shoppingCart);
+        receipt.saveReceiptToFile();
+        return receipt;
+    }
+}
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class GoodsTest {
+
+    private Goods goods;
+    private Store store;
+
+
+    @BeforeEach
+    public void setUp() {
+    	store = new Store();
+        store.setMarkup(Category.EATABLE, 20); 
+
+        goods = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 100);
+
+    }
+
+    @Test
+    public void testIsExpired() {
+        assertFalse(goods.isExpired(), "Goods should not be expired yet");
+    }
+
+    @Test
+    public void testDecreaseQuantity() {        
+        goods.decreaseQuantity(50);
+        assertEquals(50, goods.getQuantityAvailable(), "Decrease quantity should update quantity available");
+    }
+
+    @Test
+    public void testCalculateSellingPrice() {
+        store.setMarkup(Category.EATABLE, 20); 
+
+        BigDecimal expectedSellingPrice = BigDecimal.valueOf(1.0).multiply(BigDecimal.ONE.add(BigDecimal.valueOf(20).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)));
+        assertEquals(0, expectedSellingPrice.compareTo(goods.calculateSellingPrice()), 
+                     "Selling price calculation should be correct");
+    }
+
+    @Test
+    public void testEquals() {
+        Goods sameGoods = new Goods(1, "Apple", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 100);
+        Goods differentGoods = new Goods(2, "Orange", new BigDecimal("1.50"), Category.EATABLE, LocalDate.now().plusDays(3) , 5, 100);
+        Goods sameIdDifferentName = new Goods(1, "Orange", new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5) , 5, 100);
+
+        assertTrue(goods.equals(sameGoods), "Goods should be equal to another goods with the same ID");
+        assertFalse(goods.equals(differentGoods), "Goods should not be equal to another goods with a different ID");
+        assertTrue(goods.equals(sameIdDifferentName), "Goods should be equal to another goods with the same ID but different name");
+    }
+
+    
+}
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        
+        // Reading cashiers
+        List<Cashier> cashiers = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(";"))
+            .map(line -> {
+                String[] data = line.split(",");
+                int id = Integer.parseInt(data[0]);
+                String name = data[1];
+                BigDecimal salary = new BigDecimal(data[2]);
+                return new Cashier(id, name, salary);
+            })
+            .collect(Collectors.toList());
+
+        // Reading goods
+        List<Goods> goodsList = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(";"))
+            .map(line -> {
+                String[] data = line.split(",");
+                int id = Integer.parseInt(data[0]);
+                String name = data[1];
+                BigDecimal price = new BigDecimal(data[2]);
+                Category category = Category.valueOf(data[3].toUpperCase());
+                LocalDate expirationDate = LocalDate.parse(data[4]);
+                Double discountPercentage = Double.parseDouble(data[5]);
+                int quantity = Integer.parseInt(data[6]);
+                return new Goods(id, name, price, category, expirationDate, discountPercentage, quantity);
+            })
+            .collect(Collectors.toList());
+
+        // Creating store
+        Store store = new Store();
+        store.setMarkup(Category.EATABLE, 20);
+        store.setMarkup(Category.NON_EDIBLE, 10);
+
+        // Adding cashiers to store
+        for (Cashier cashier : cashiers) {
+            store.addCashier(cashier);
+        }
+
+        // Adding goods to store
+        for (Goods goods : goodsList) {
+            store.addGoods(goods);
+        }
+
+
+        // Reading shopping carts
+        String line;
+        int cashierIndex = 0;
+        while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) {
+            Map<Goods, Integer> items = new HashMap<>();
+            BigDecimal totalPrice = new BigDecimal(bufferedReader.readLine());
+
+            List<String> cartItems = Stream.of(line.replaceAll("\\s+$", "").split(";"))
+                .collect(Collectors.toList());
+
+            for (String item : cartItems) {
+                String[] data = item.split(",");
+                int goodsId = Integer.parseInt(data[0]);
+                int quantity = Integer.parseInt(data[1]);
+                Goods goods = goodsList.stream().filter(g -> g.getId() == goodsId).findFirst().orElse(null);
+                if (goods != null) {
+                    items.put(goods, quantity);
+                }
+            }
+
+            ShoppingCart cart = new ShoppingCart(items, totalPrice);
+            Checkout checkout = new Checkout(cashiers.get(cashierIndex));
+            cashierIndex = (cashierIndex + 1) % cashiers.size(); // Rotate the cashier
+            Receipt receipt = store.checkoutClient(checkout, cart);
+        }
+
+        // Viewing financial information
+        System.out.println("Total delivery costs: $" + store.calculateTotalDeliveryCosts());
+        System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());
+        System.out.println("Total revenue: $" + store.getTotalTurnover());
+        System.out.println("Total profit: $" + store.calculateTotalProfit());
+        System.out.println("Total number of receipts issued: " + store.getTotalReceiptsIssued());
+    }
+}
+
+/* public class Main {
+    public static void main(String[] args) {
+        // Use BufferedReader to read data from a file (replace "input.txt" with your actual file path)
+        try (BufferedReader reader = new BufferedReader(new FileReader("input.txt"))) {
+            String line;
+            
+            // Store
+            Store store = new Store();
+            
+            // Read markup for categories
+            line = reader.readLine();
+            String[] markupData = line.split(",");
+            store.setMarkup(Category.valueOf(markupData[0]), Double.parseDouble(markupData[1]));
+            store.setMarkup(Category.valueOf(markupData[2]), Double.parseDouble(markupData[3]));
+            
+            // Read cashiers
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                String[] cashierData = line.split(",");
+                int id = Integer.parseInt(cashierData[0]);
+                String name = cashierData[1];
+                BigDecimal salary = new BigDecimal(cashierData[2]);
+                store.addCashier(new Cashier(id, name, salary));
+            }
+            
+            // Read goods
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                String[] goodsData = line.split(",");
+                int id = Integer.parseInt(goodsData[0]);
+                String name = goodsData[1];
+                BigDecimal price = new BigDecimal(goodsData[2]);
+                Category category = Category.valueOf(goodsData[3]);
+                LocalDate expiryDate = LocalDate.parse(goodsData[4]);
+                int discount = Integer.parseInt(goodsData[5]);
+                int stock = Integer.parseInt(goodsData[6]);
+                store.addGoods(new Goods(id, name, price, category, expiryDate, discount, stock));
+            }
+            
+            // Process shopping carts (assuming data for carts is also present in the file)
+            processCarts(reader, store);
+            
+            // Viewing financial information
+            System.out.println("Total delivery costs: $" + store.calculateTotalDeliveryCosts());
+            System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());
+            System.out.println("Total revenue: $" + store.getTotalTurnover());
+            System.out.println("Total profit: $" + store.calculateTotalProfit());
+            System.out.println("Total number of receipts issued: " + store.getTotalReceiptsIssued());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static void processCarts(BufferedReader reader, Store store) throws IOException {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] cartData = line.split(",");
+            
+            Map<Goods, Integer> items = new HashMap<>();
+            ShoppingCart cart = new ShoppingCart(items, new BigDecimal(cartData[0])); // Use BigDecimal for total amount
+            
+            for (int i = 1; i < cartData.length; i++) {
+                String[] itemData = cartData[i].split(":");
+                Goods good = store.getGoodsById(Integer.parseInt(itemData[0]));
+                int quantity = Integer.parseInt(itemData[1]);
+                cart.addItem(good, quantity);
+            }
+            
+            Checkout checkout = new Checkout(store.getCashierById(Integer.parseInt(cartData[cartData.length - 1])));
+            store.checkoutClient(checkout, cart);
+        }
+    }
+}
+ */
+
+/*
+public class Main {
+    public static void main(String[] args) {
+    	     
+        // Creating store
+        Store store = new Store();
+        store.setMarkup(Category.EATABLE, 20); 
+        store.setMarkup(Category.NON_EDIBLE, 10); 
+        
+        // Adding cashiers
+        Cashier cashier1 = new Cashier(1, "John Doe", new BigDecimal("1000.00"));
+        Cashier cashier2 = new Cashier(2, "Anna Smith", new BigDecimal("1200.00"));
+        store.addCashier(cashier1);
+        store.addCashier(cashier2);
+
+        // Adding goods
+        Goods goods1 = new Goods(1, "Apple",  new BigDecimal("1.56"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
+        Goods goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 1000);
+        store.addGoods(goods1);
+        store.addGoods(goods2);
+        
+        // First cart
+        Map<Goods, Integer> items = new HashMap<>();
+        ShoppingCart cart = new ShoppingCart(items,  new BigDecimal("200.55"));
+        cart.addItem(goods1, 20);
+        cart.addItem(goods2, 10);
+        Checkout checkout = new Checkout(cashier2);
+        Receipt receipt = store.checkoutClient(checkout, cart);   
+               
+        // Second cart
+        Map<Goods, Integer> items1 = new HashMap<>();
+        ShoppingCart cart1 = new ShoppingCart(items1,  new BigDecimal("150.25"));
+        cart1.addItem(goods1, 10);
+        cart1.addItem(goods2, 5);
+        Checkout checkout1 = new Checkout(cashier1);
+        Receipt receipt1 = store.checkoutClient(checkout1, cart1);
+
+        
+        // Third cart
+        Map<Goods, Integer> items2 = new HashMap<>();
+        ShoppingCart cart2 = new ShoppingCart(items2, new BigDecimal("300.75"));
+        cart2.addItem(goods1, 15);
+        cart2.addItem(goods2, 8);
+        Checkout checkout2 = new Checkout(cashier2);
+        Receipt receipt2 = store.checkoutClient(checkout2, cart2);
+
+        // Fourth cart
+        Map<Goods, Integer> items3 = new HashMap<>();
+        ShoppingCart cart3 = new ShoppingCart(items3, new BigDecimal("500.50"));
+        cart3.addItem(goods1, 30);
+        cart3.addItem(goods2, 20);
+        Checkout checkout3 = new Checkout(cashier1);
+        Receipt receipt3 = store.checkoutClient(checkout3, cart3);
+
+        // Viewing financial information
+        System.out.println("Total delivery costs: $" + store.calculateTotalDeliveryCosts());
+        System.out.println("Total cashier salaries: $" + store.calculateTotalCashierSalaries());
+        System.out.println("Total revenue: $" + store.getTotalTurnover());
+        System.out.println("Total profit: $" + store.calculateTotalProfit());
+        System.out.println("Total number of receipts issued: " + store.getTotalReceiptsIssued());
+    }
+}
+*/
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -1206,26 +788,46 @@ import java.util.*;
 public class Store {
     private Set<Cashier> cashiers;
     private Set<Receipt> receipts;
-    private Map<Integer, Goods> goodsMap;
+    private Map<Integer, Goods> deliveredGoods;
+    private Map<Integer, Integer> soldGoods;
     private BigDecimal totalTurnover;
 
     public Store() {
         this.cashiers = new HashSet<>();
-        this.goodsMap = new HashMap<>();
         this.receipts = new HashSet<>();
+        this.deliveredGoods = new HashMap<>();
+        this.soldGoods = new HashMap<>();
         this.totalTurnover = BigDecimal.ZERO;
     }
     
     public void addCashier(Cashier cashier) {
         cashiers.add(cashier);
     }
+      
+    public Cashier getCashierById(int id) {
+        for (Cashier cashier : cashiers) {
+          if (cashier.getId() == id) {
+            return cashier;
+          }
+        }
+        return null;
+      }
 
     public void addGoods(Goods goods) {
-        goodsMap.put(goods.getId(), goods);
+        deliveredGoods.put(goods.getId(), goods);
     }
 
     public Goods getGoodsById(int id) {
-        return goodsMap.get(id);
+        return deliveredGoods.get(id);
+    }
+    
+	public BigDecimal getTotalTurnover() {
+		return totalTurnover;
+	}
+	
+    // Method to get total number of receipts issued
+    public int getTotalReceiptsIssued() {
+        return getReceipts().size();
     }
 
     // Method to check goods availability
@@ -1241,7 +843,7 @@ public class Store {
     public BigDecimal calculateTotalCashierSalaries() {
     	 BigDecimal totalSalaries = BigDecimal.ZERO;
          for (Cashier cashier : cashiers) {
-             totalSalaries = totalSalaries.add(BigDecimal.valueOf(cashier.getMonthlySalary()).multiply(BigDecimal.valueOf(12)));
+             totalSalaries = totalSalaries.add(cashier.getMonthlySalary().multiply(BigDecimal.valueOf(12)));
          }
          return totalSalaries;
     }
@@ -1249,7 +851,7 @@ public class Store {
     // Method to calculate total costs for goods delivery
     public BigDecimal calculateTotalDeliveryCosts() {
         BigDecimal totalDeliveryCosts = BigDecimal.ZERO;
-        for (Goods goods : goodsMap.values()) {
+        for (Goods goods : deliveredGoods.values()) {
             totalDeliveryCosts = totalDeliveryCosts.add(goods.getUnitDeliveryPrice().multiply(BigDecimal.valueOf(goods.getTotalDelivered())));
         }
         return totalDeliveryCosts;
@@ -1259,41 +861,44 @@ public class Store {
     public BigDecimal calculateTotalProfit() {
         return getTotalTurnover().subtract(calculateTotalCashierSalaries()).subtract(calculateTotalDeliveryCosts());
     }
-
-    // Method to get total number of receipts issued
-    public int getTotalReceiptsIssued() {
-        return getReceipts().size();
+    
+    // Method to add sold goods
+    private void addSoldGoods(Goods goods, int quantitySold) {
+        soldGoods.merge(goods.getId(), quantitySold, Integer::sum);
     }
     
     public Receipt checkoutClient(Checkout checkout, ShoppingCart cart) {
-        Receipt receipt = checkout.markGoods(cart);
+        Receipt receipt = checkout.sellGoods(cart);
         totalTurnover = totalTurnover.add(receipt.getTotalAmountPaid());
         receipts.add(receipt);
+
+        for (Map.Entry<Goods, Integer> entry : cart.getItems().entrySet()) {
+            Goods goods = entry.getKey();
+            int quantity = entry.getValue();
+            addSoldGoods(goods, quantity);
+        }
+        
         return receipt;
     }
 
+    public Set<Cashier> getCashier() {
+		return cashiers;
+	}
+    
 	public Set<Receipt> getReceipts() {
 		return receipts;
 	}
-
-	public void setReceipts(Set<Receipt> receipts) {
-		this.receipts = receipts;
-	}
 	
-	public BigDecimal getTotalTurnover() {
-		return totalTurnover;
-	}
-
-	public void setTotalTurnover(BigDecimal totalTurnover) {
-		this.totalTurnover = totalTurnover;
-	}
-	
-	public static void setMarkup(Category category, double value) {
-        category.setValue(value);
+    public Map<Integer, Integer> getSoldGoods() {
+        return soldGoods;
+    }
+    
+    public Map<Integer, Goods> getDeliveredGoods() {
+        return deliveredGoods;
     }
 	
-	public static double getMarkup(Category category) {
-        return category.getValue();
+	public void setMarkup(Category category, double value) {
+        category.setValue(value);
     }
 	
     public void setExpirationDateInStore(Goods good, LocalDate expirationDate) {
@@ -1304,5 +909,86 @@ public class Store {
     	good.setDiscountPercentage(discountPercentage);
     }
     
+}
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
+class CheckoutTest {
+
+    private Cashier cashier;
+    private Store store;
+    private Checkout checkout;
+    private ShoppingCart shoppingCart;
+    private Goods goods1;
+    private Goods goods2;
+
+    @BeforeEach
+    public void setUp() {
+        cashier = new Cashier(1, "John Doe", new BigDecimal("1000.00"));
+        store = new Store();
+        store.setMarkup(Category.EATABLE, 20); 
+
+        goods1 = new Goods(1, "Apple",  new BigDecimal("1.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        goods2 = new Goods(2, "Milk",  new BigDecimal("2.00"), Category.EATABLE, LocalDate.now().plusDays(5), 5, 100);
+        store.addGoods(goods1);
+        store.addGoods(goods2);
+        
+        Map<Goods, Integer> items = new HashMap<>();
+        shoppingCart = new ShoppingCart(items, new BigDecimal("100.00"));
+        shoppingCart.addItem(goods1, 2);
+        shoppingCart.addItem(goods2, 3);
+        checkout = new Checkout(cashier);
+    }
+
+    @Test
+    public void testSellGoodsSuccess() {
+    	Receipt receipt = store.checkoutClient(checkout, shoppingCart);
+
+        assertEquals(98, goods1.getQuantityAvailable());
+        assertEquals(97, goods2.getQuantityAvailable());
+        assertEquals(new BigDecimal("9.60"), receipt.getTotalAmountPaid());
+        assertEquals(1, store.getReceipts().size());
+
+    }
+    
+    @Test
+    public void testSellGoodsNotEnoughQuantity() {
+        goods1.setQuantityAvailable(1); // Not enough quantity
+
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+        	store.checkoutClient(checkout, shoppingCart);
+        });
+        assertEquals("Not enough quantity available for sale: Apple", thrown.getMessage());
+    }
+
+    @Test
+    public void testSellGoodsItemExpired() {
+        store.setExpirationDateInStore(goods1, LocalDate.now().minusDays(1)); // Item expired
+
+    	Receipt receipt = store.checkoutClient(checkout, shoppingCart);
+
+        assertEquals(goods1.getTotalDelivered(), goods1.getQuantityAvailable());
+        assertEquals(new BigDecimal("7.20"), receipt.getTotalAmountPaid());
+
+    }
+
+    
+
+    @Test
+    public void testSellGoodsNotEnoughMoney() {
+        shoppingCart.setCustomerMoney(new BigDecimal("5.00")); // Not enough money
+
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+        	store.checkoutClient(checkout, shoppingCart);            
+        });
+        assertEquals("Not enough money to buy these goods.", thrown.getMessage());
+    }
 }

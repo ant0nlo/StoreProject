@@ -1,14 +1,13 @@
          RECEIPT
 =========================
 Serial Number: 1
-Issued by: John Doe
+Issued by: Georgi Petrov
 -------------------------
-Date: 2024-06-03
-Time: 11:59:12
+Date: 2024-06-04
+Time: 18:40:52
 -------------------------
--20 Apple           $1.56
--10 Milk            $2.00
+-10 Bread           $2.00
 =========================
- TOTAL:          $61.40
+ TOTAL:          $24.00
 Cash:            $200.55
-Change:          $139.15
+Change:          $176.55

@@ -61,10 +61,11 @@ class CheckoutTest {
     public void testSellGoodsItemExpired() {
         store.setExpirationDateInStore(goods1, LocalDate.now().minusDays(1)); // Item expired
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-        	store.checkoutClient(checkout, shoppingCart);
-        });
-        assertEquals("The item Apple has expired and cannot be sold.", thrown.getMessage());
+    	Receipt receipt = store.checkoutClient(checkout, shoppingCart);
+
+        assertEquals(goods1.getTotalDelivered(), goods1.getQuantityAvailable());
+        assertEquals(new BigDecimal("7.20"), receipt.getTotalAmountPaid());
+
     }
 
     
@@ -74,8 +75,7 @@ class CheckoutTest {
         shoppingCart.setCustomerMoney(new BigDecimal("5.00")); // Not enough money
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            checkout.markGoods(shoppingCart);
-            
+        	store.checkoutClient(checkout, shoppingCart);            
         });
         assertEquals("Not enough money to buy these goods.", thrown.getMessage());
     }

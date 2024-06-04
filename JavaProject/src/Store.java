@@ -11,15 +11,24 @@ public class Store {
 
     public Store() {
         this.cashiers = new HashSet<>();
+        this.receipts = new HashSet<>();
         this.deliveredGoods = new HashMap<>();
         this.soldGoods = new HashMap<>();
-        this.receipts = new HashSet<>();
         this.totalTurnover = BigDecimal.ZERO;
     }
     
     public void addCashier(Cashier cashier) {
         cashiers.add(cashier);
     }
+      
+    public Cashier getCashierById(int id) {
+        for (Cashier cashier : cashiers) {
+          if (cashier.getId() == id) {
+            return cashier;
+          }
+        }
+        return null;
+      }
 
     public void addGoods(Goods goods) {
         deliveredGoods.put(goods.getId(), goods);
@@ -27,6 +36,15 @@ public class Store {
 
     public Goods getGoodsById(int id) {
         return deliveredGoods.get(id);
+    }
+    
+	public BigDecimal getTotalTurnover() {
+		return totalTurnover;
+	}
+	
+    // Method to get total number of receipts issued
+    public int getTotalReceiptsIssued() {
+        return getReceipts().size();
     }
 
     // Method to check goods availability
@@ -60,15 +78,6 @@ public class Store {
     public BigDecimal calculateTotalProfit() {
         return getTotalTurnover().subtract(calculateTotalCashierSalaries()).subtract(calculateTotalDeliveryCosts());
     }
-
-    // Method to get total number of receipts issued
-    public int getTotalReceiptsIssued() {
-        return getReceipts().size();
-    }
-    
-    public Map<Integer, Integer> getSoldGoods() {
-        return soldGoods;
-    }
     
     // Method to add sold goods
     private void addSoldGoods(Goods goods, int quantitySold) {
@@ -76,7 +85,7 @@ public class Store {
     }
     
     public Receipt checkoutClient(Checkout checkout, ShoppingCart cart) {
-        Receipt receipt = checkout.markGoods(cart);
+        Receipt receipt = checkout.sellGoods(cart);
         totalTurnover = totalTurnover.add(receipt.getTotalAmountPaid());
         receipts.add(receipt);
 
@@ -89,21 +98,21 @@ public class Store {
         return receipt;
     }
 
+    public Set<Cashier> getCashier() {
+		return cashiers;
+	}
+    
 	public Set<Receipt> getReceipts() {
 		return receipts;
 	}
-
-	public void setReceipts(Set<Receipt> receipts) {
-		this.receipts = receipts;
-	}
 	
-	public BigDecimal getTotalTurnover() {
-		return totalTurnover;
-	}
-
-	public void setTotalTurnover(BigDecimal totalTurnover) {
-		this.totalTurnover = totalTurnover;
-	}
+    public Map<Integer, Integer> getSoldGoods() {
+        return soldGoods;
+    }
+    
+    public Map<Integer, Goods> getDeliveredGoods() {
+        return deliveredGoods;
+    }
 	
 	public void setMarkup(Category category, double value) {
         category.setValue(value);

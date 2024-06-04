@@ -19,7 +19,7 @@ public class Receipt {
         this.issuingCashier = issuingCashier;
         this.issuanceDateTime = LocalDateTime.now();
         this.shoppingCart = shoppingCart;
-        calculateTotalAmountPaid();
+        this.totalAmountPaid = shoppingCart.calculateTotalAmountToPay();
     }
 
     public int getSerialNumber() {
@@ -52,21 +52,6 @@ public class Receipt {
 
     public void setTotalAmountPaid(BigDecimal totalAmountPaid) {
         this.totalAmountPaid = totalAmountPaid;
-    }
-
-    // Method to calculate the total amount paid
-    private void calculateTotalAmountPaid() {
-        totalAmountPaid = BigDecimal.ZERO;
-        Map<Goods, Integer> items = shoppingCart.getItems();
-
-        for (Map.Entry<Goods, Integer> entry : items.entrySet()) {
-            Goods goods = entry.getKey();
-            int quantity = entry.getValue();
-            BigDecimal itemTotal = goods.calculateSellingPrice().multiply(BigDecimal.valueOf(quantity));
-            totalAmountPaid = totalAmountPaid.add(itemTotal);
-        }
-
-        totalAmountPaid = totalAmountPaid.setScale(2, RoundingMode.HALF_UP);
     }
 
     // Method to generate receipt content

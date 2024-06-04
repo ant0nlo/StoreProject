@@ -100,6 +100,10 @@ public class Goods {
 
     // Method to calculate selling price
     public BigDecimal calculateSellingPrice() {
+    	if (unitDeliveryPrice == null) {
+            throw new IllegalStateException("Unit delivery price is not set.");
+        }
+    	
         BigDecimal markupPercentage = BigDecimal.valueOf(getCategory().getValue());
         BigDecimal sellingPrice = unitDeliveryPrice.multiply(
                 BigDecimal.ONE.add(markupPercentage.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP))
@@ -132,7 +136,7 @@ public class Goods {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", unitDeliveryPrice=" + unitDeliveryPrice +
-                ", category='" + category + '\'' +
+                ", category='" + category.getName() + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", markupPercentage=" + markupPercentage +
                 ", discountPercentage=" + discountPercentage +
