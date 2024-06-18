@@ -1,98 +1,120 @@
 
-# Ray Casting Game on PyGame
+## Store Management System
 
-## Overview
+### Overview
 
-This project is a video game developed using the PyGame library. The game features 3D visualization from a 2D map using the raycasting technique, creating graphical scenes with depth and perspective.
+The Store Management System is a Java-based application designed to manage a store's operations, including cashier management, goods management, and checkout processes. The system utilizes a MySQL database to store and manage data related to cashiers, goods, receipts, and shopping cart items.
 
-![game](images/photos/1.png)
-![game](images/photos/4.png)
-![game](images/photos/5.png)
+### Features
 
-## Table of Contents
+- **Cashier Management**: Add, update, and delete cashier records.
+- **Goods Management**: Add, update, and delete goods records.
+- **Checkout Process**: Manage the checkout process, generate receipts, and update inventory.
+- **Database Integration**: Store and manage data in a MySQL database.
+- **Financial Reporting**: Calculate total delivery costs, cashier salaries, revenue, profit, and number of receipts issued.
 
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Main Components](#main-components)
-4. [Contributing](#contributing)
-5. [License](#license)
+### Prerequisites
 
-## Installation
+- Java Development Kit (JDK) 11 or higher
+- MySQL database server
+- MySQL Connector/J (JDBC driver for MySQL)
+- Maven (for project build and dependency management)
 
-To run this game, you need to have Python and the PyGame library installed. You can install PyGame using pip:
+### Getting Started
 
-```bash
-pip install pygame
+#### 1. Clone the Repository
+
+```sh
+git clone https://github.com/ant0nlo/StoreProject.git
+cd StoreProject
 ```
 
-Clone the repository to your local machine:
+#### 2. Set Up the Database
 
-```bash
-git clone https://github.com/yourusername/ray-casting-game.git
-cd ray-casting-game
+Ensure you have a MySQL database running. Create a database named `mydb` and update the `DatabaseManager` class with your database credentials.
+
+```sql
+CREATE DATABASE mydb;
 ```
 
-## Usage
+Update `DatabaseManager.java` with your MySQL username and password:
 
-To start the game, run the `main.py` file:
-
-```bash
-python main.py
+```java
+String URL = "jdbc:mysql://localhost:3306/mydb";
+String username = "your_mysql_username";
+String password = "your_mysql_password";
 ```
 
-## Main Components
+#### 3. Build the Project
 
-### Game Class
+Use Maven to build the project:
 
-The `Game` class is the main controller of the game. It initializes and manages the game loop, including event handling, game state updates, and rendering objects.
+```sh
+mvn clean install
+```
 
-- **Methods:**
-  - `update()`: Updates the game state.
-  - `create()`: Renders objects.
-  - `run()`: Runs the main loop that continues while the game is active.
+#### 4. Run the Application
 
-### Map Class
+You can run the application with the following command. Ensure you have an input file (`input.txt`) with the required format as described earlier.
 
-The `Map` class converts the abstract representation of the world (via a two-dimensional array) into graphical objects that can be displayed on the screen.
+```sh
+java -cp target/StoreProject-1.0-SNAPSHOT.jar com.store.main.Main < input.txt
+```
 
-### Hero Class
+### Input Format
 
-The `Hero` class represents the player's character in the game, handling movement, interactions, and status.
+The input should be provided in the following format:
 
-### Enemy Class
+1. **Cashiers**: `id,name,salary` separated by `;`.
+2. **Goods**: `id,name,price,category,expirationDate,discountPercentage,quantity` separated by `;`.
+3. **Shopping Carts**: `id,quantity` separated by `;`, followed by the total price of the cart.
 
-The `Enemy` class represents non-player characters that the player interacts with or combats within the game.
+Example:
 
-### Weapon Class
+```plaintext
+1,John Doe,1000;2,Anna Smith,1200
+1,Apple,1.56,EATABLE,2024-12-31,5,1000;2,Milk,2.00,EATABLE,2024-12-31,5,1000
+1,20;2,10
+200.55
+1,10;2,5
+150.25
+```
 
-The `Weapon` class handles the functionality and effects of the player's weapons.
+### Usage
 
-### RayCasting Class
+1. **Cashier Management**: Add and manage cashier details including ID, name, and salary.
+2. **Goods Management**: Add and manage goods details including ID, name, price, category, expiration date, discount percentage, and quantity.
+3. **Checkout Process**: Manage the checkout process, ensure goods availability, generate receipts, and update inventory.
+4. **Database Management**: Use the `DatabaseManager` class to handle database operations such as creating tables, adding records, and deleting records.
 
-The `RayCasting` class implements the raycasting technique to render the 3D perspective from the 2D map.
+### Example Output
 
-### Objects Class
+The application will output financial information after processing the input:
 
-The `Objects` class manages various interactive and static objects within the game world.
+```plaintext
+Total delivery costs: $1560.00
+Total cashier salaries: $26400.00
+Total revenue: $500.00
+Total profit: $200.00
+Total number of receipts issued: 2
+```
 
-### Sprite Class
+### Testing
 
-The `Sprite` class handles the graphical representation of objects, including their animations and transformations.
+Unit tests are provided in the `com.store.tests` package. You can run the tests using Maven:
 
-### Constants
+```sh
+mvn test
+```
 
-The `constants.py` file contains various constants used throughout the game, such as screen dimensions, colors, and game settings.
+### Contributions
 
-## Contributing
+Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes. Ensure your code adheres to the project's coding standards and includes appropriate tests.
+### License
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## License
+### Contact
 
-This project is licensed under the MIT License. See the `LICENSE` file for more information.
+For any inquiries or issues, please contact [your_email@example.com].
