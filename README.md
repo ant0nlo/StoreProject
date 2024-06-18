@@ -20,42 +20,6 @@ The Store Management System is a Java-based application designed to manage a sto
 - MySQL Connector/J (JDBC driver for MySQL)
 - Maven (for project build and dependency management)
 
-### Project Structure
-
-```plaintext
-src/
-|-- main/
-|   |-- java/
-|       |-- com/
-|           |-- store/
-|               |-- database/
-|               |   |-- DatabaseManager.java
-|               |-- main/
-|               |   |-- Main.java
-|               |-- models/
-|               |   |-- Cashier.java
-|               |   |-- Category.java
-|               |   |-- Checkout.java
-|               |   |-- Goods.java
-|               |   |-- Receipt.java
-|               |   |-- ShoppingCart.java
-|               |   |-- Store.java
-|               |-- services/
-|                   |-- StoreService.java
-|-- test/
-    |-- java/
-        |-- com/
-            |-- store/
-                |-- tests/
-                    |-- models/
-                    |   |-- CashierTest.java
-                    |   |-- GoodsTest.java
-                    |-- services/
-                    |   |-- StoreServiceTest.java
-                    |-- database/
-                        |-- DatabaseManagerTest.java
-```
-
 ### Getting Started
 
 #### 1. Clone the Repository
