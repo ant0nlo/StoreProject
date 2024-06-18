@@ -3,8 +3,8 @@
 Serial Number: 2
 Issued by: Anna Smith
 -------------------------
-Date: 2024-06-03
-Time: 11:59:12
+Date: 2024-06-18
+Time: 11:01:48
 -------------------------
 -10 Apple           $1.56
 -5 Milk            $2.00
