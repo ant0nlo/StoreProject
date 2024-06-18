@@ -1,7 +1,17 @@
+package com.store.database.tests;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.store.database.DatabaseManager;
+import com.store.models.Cashier;
+import com.store.models.Category;
+import com.store.models.Checkout;
+import com.store.models.Goods;
+import com.store.models.Receipt;
+import com.store.models.ShoppingCart;
+import com.store.models.Store;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -106,7 +116,7 @@ public class DatabaseManagerTest {
         ShoppingCart shoppingCart = new ShoppingCart(items, new BigDecimal("200.00"));
         shoppingCart.addItem(goods, 5);
         Checkout checkout = new Checkout(cashier);
-        Receipt receipt = checkout.markGoods(shoppingCart);
+        Receipt receipt = checkout.sellGoods(shoppingCart);
 
         dbManager.addReceipt(receipt);
 
@@ -143,7 +153,7 @@ public class DatabaseManagerTest {
         shoppingCart.addItem(goods, 5);
 
         Checkout checkout = new Checkout(cashier);
-        Receipt receipt = checkout.markGoods(shoppingCart);
+        Receipt receipt = checkout.sellGoods(shoppingCart);
 
         dbManager.addReceipt(receipt);
         dbManager.addItemToShoppingCart(shoppingCart, receipt);

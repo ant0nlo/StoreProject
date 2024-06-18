@@ -1,3 +1,4 @@
+package com.store.main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.store.models.Cashier;
+import com.store.models.Category;
+import com.store.models.Checkout;
+import com.store.models.Goods;
+import com.store.models.Receipt;
+import com.store.models.ShoppingCart;
+import com.store.models.Store;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -89,6 +98,7 @@ public class Main {
         System.out.println("Total number of receipts issued: " + store.getTotalReceiptsIssued());
     }
 }
+
 
 
 /*

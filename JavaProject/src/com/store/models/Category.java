@@ -1,3 +1,4 @@
+package com.store.models;
 
 public enum Category {
 	EATABLE(0.0),

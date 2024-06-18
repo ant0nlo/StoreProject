@@ -1,5 +1,11 @@
+package com.store.database;
 import java.sql.*;
 import java.util.Map;
+
+import com.store.models.Cashier;
+import com.store.models.Goods;
+import com.store.models.Receipt;
+import com.store.models.ShoppingCart;
 
 public class DatabaseManager {
 	 String URL = "jdbc:mysql://localhost:3306/mydb";

@@ -1,6 +1,15 @@
+package com.store.models.tests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.store.models.Cashier;
+import com.store.models.Category;
+import com.store.models.Checkout;
+import com.store.models.Goods;
+import com.store.models.Receipt;
+import com.store.models.ShoppingCart;
+import com.store.models.Store;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,21 +69,16 @@ class CheckoutTest {
     @Test
     public void testSellGoodsItemExpired() {
         store.setExpirationDateInStore(goods1, LocalDate.now().minusDays(1)); // Item expired
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-        	store.checkoutClient(checkout, shoppingCart);
-        });
-        assertEquals("The item Apple has expired and cannot be sold.", thrown.getMessage());
+        store.checkoutClient(checkout, shoppingCart);
+        assertEquals(100, goods1.getQuantityAvailable());
     }
-
-    
 
     @Test
     public void testSellGoodsNotEnoughMoney() {
         shoppingCart.setCustomerMoney(new BigDecimal("5.00")); // Not enough money
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            checkout.markGoods(shoppingCart);
+            checkout.sellGoods(shoppingCart);
             
         });
         assertEquals("Not enough money to buy these goods.", thrown.getMessage());

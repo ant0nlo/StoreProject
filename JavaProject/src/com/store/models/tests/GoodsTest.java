@@ -1,9 +1,14 @@
+package com.store.models.tests;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.store.models.Category;
+import com.store.models.Goods;
+import com.store.models.Store;
 
 import static org.junit.jupiter.api.Assertions.*;
 
